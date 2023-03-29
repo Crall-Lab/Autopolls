@@ -1,0 +1,658 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8"/>
+  <title>Pollinator Camera</title>
+  <script src="/static/vue.min.js"></script>
+<style>
+#overlay {
+  display:inline-block;
+  background-repeat:no-repeat;
+  width:800px;
+  height:600px;
+  position:absolute;
+  top:0px;
+  left:0px;
+  z-index:1;
+  display:none;
+}
+</style>
+</head>
+<body>
+  <div id="vm">
+    <div id="overlay"></div>
+    <!-- status bar -->
+    <span>
+      {{ cameras.length }} Cameras
+    </span>
+    <span
+      :style="
+        temperature < 75 ?
+        {'background-color': 'lightcyan'} :
+        {'background-color': 'tomato'}">
+      Core Temperature: {{ Math.round(temperature) }}C
+    </span>
+    <span
+      :style="disk_usage_style"> 
+      Disk Used: {{ (100 * disk_usage.used / disk_usage.total).toFixed(2) + '%' }}
+    </span>
+    <input type="date" id="datesel" @change="sync"/>
+    <!--<button id="save_button" style="float: right; clear: both" onclick="freeze()">Save configs</button>-->
+    <span style="width: 200px; display: inline-block"></span>
+    <button id="save_button" onclick="freeze()">Save configs</button>
+    <!-- cameras -->
+    <camera-view
+      inline-template
+      v-for="camera in cameras"
+      :key="camera.name"
+      v-bind="camera"
+    >
+      <div
+        class="camera-view"
+        :style="selected ? {background: '#e9fbe9'} : {background: 'white'}">
+        <canvas
+          :id="name + 'canvas'" width=400 height=300
+          style="float:left;"
+          @mousemove="zoom"
+          @mouseout="zoom"
+          @click="canvas_click"
+        ></canvas>
+        <!-- TODO display for config floating right -->
+        <div style="float:right; display:block; width: 400px;">{{ cfg }}</div>
+        <!--
+        <img
+          v-if="active"
+          :id="name + 'img'"
+          :src="snapshot_url"
+          style="width: 400px; float:left; border-color:lightcyan"
+          border=5
+          @mousemove="zoom"
+          @mouseout="zoom"
+        ></img>
+        <img
+          v-else
+          :id="name + 'img'"
+          :src="snapshot_url"
+          style="width: 400px; float:left; border-color:tomato"
+          border=5
+          @mousemove="zoom"
+          @mouseout="zoom"
+        ></img>
+        -->
+        <div>IP address = {{ ip }}</div>
+        <div><a :href="stills_url">Name/MAC = {{ name }}</a></div>
+        <div>Up for [{{ uptime_string }}]</div>
+        <div><a :href="detections_url">N Detections = {{ detections.length }}</a></div>
+        <div><a :href="overview_url">Overview</a></div>
+        <div><a :href="videos_url">Videos</a></div>
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          viewBox="0 0 720 30"
+          width=720
+          height=30
+          @click="select_time"
+        >
+          <rect x=1 y=1 width=718 height=18 style="fill:lightyellow;stroke:black;stroke-width:0.5px"/>
+          <rect x=1 y=1 width=150 height=18 style="fill:lightgray;stroke:none"/>
+          <rect x=630 y=1 width=809 height=18 style="fill:lightgray;stroke:none"/>
+          <pattern id=ticks x=0 y=0 width=30 height=30 patternUnits="userSpaceOnUse">
+            <rect x=0 y=0 width=1 height=30 style="fill:lightgray;stroke:none"/>
+          </pattern>
+          <rect x=30 y=0 width=690 height=30 fill="url(#ticks)"/>
+          <rect
+            v-if="$parent.day === ''"
+            :x="now_x()"
+            y=0
+            width=2 height=30
+            style="fill:orange"
+          />
+          <text x=182 y=15 font-size="12px">6</text>
+          <text x=362 y=15 font-size="12px">12</text>
+          <text x=542 y=15 font-size="12px">18</text>
+          <rect
+            v-for="detection in detections"
+            :x="detection_to_x(detection)" y=0
+            width=10 height=30
+            style="stroke:none;fill:green"
+            @click="show_detection(detection)"
+          />
+          <rect
+            v-if="minute > -1"
+            :x="minute / 2" y=0
+            width=4 height=30
+            style="fill:black;stroke:none"
+          />
+        </svg>
+        <div v-if="detection.filename !== ''">
+          Video: <a :href="strip_mnt(detection.meta.filename)">{{ strip_mnt(detection.meta.filename) }}</a><br />
+          Classes: <a v-for="d in detection.meta.detections.flat(1)" :href="'http://wikipedia.org/wiki/' + d[0]">{{ d[0] }}[{{ d[1].toFixed(2) }}],</a>
+        </div>
+        <div class="controls">
+          <input type="checkbox" v-model="cfg_edit">Edit</input>
+          <button @click="clear_rois" :disabled="!cfg_edit">Clear ROIs</button>
+          <button @click="clone_cfg" :disabled="!cfg_edit">Clone config to other cameras</button>
+          <br />
+          <span>Allow:</span>
+          <input type="text" v-model="cfg.detector.allow" :disabled="!cfg_edit"></input>
+          <br />
+          <select v-model="selected_cfg" :disabled="!cfg_edit">
+            <option>detector.min_dev</option>
+            <option>detector.n_std</option>
+            <option>detector.threshold</option>
+            <option>recording.save_video</option>
+            <option>recording.duty_cycle</option>
+            <option>recording.max_time</option>
+            <option>recording.min_time</option>
+            <option>recording.post_time</option>
+            <option>recording.periodic_still</option>
+            <option>properties.focus</option>
+          </select>
+          <input
+            v-model="selected_cfg_value"
+            @keyup="validate_selected_cfg"
+            :disabled="!cfg_edit"
+            :style="{'background-color': selected_cfg_bg}"
+          ></input>
+          <button @click="commit_cfg" :disabled="!cfg_edit">Commit</button>
+        </div>
+        <div style="clear:both"></div>
+      </div>
+    </camera-view>
+  </div>
+
+  <script>
+    page_timestamp = (new Date()).getTime();
+    freeze = function () {
+      fetch("/freeze", {method: "POST"}).then((r) => {
+        el = document.getElementById("save_button");
+        if (r.status !== 200) {
+          alert("Failed to save configs: " + r.status)
+          el.style.backgroundColor = 'red';
+        } else {
+          el.style.backgroundColor = 'lightgreen';
+        };
+      });
+    };
+    Vue.component('camera-view', {
+      /*props: [  // passed in from parent
+        'ip', 'name', 'uptime', 'image', 'active', 'detections', 'day',
+        'selected', 'detection_index', 'cfg'],*/
+      props: {  // passed in from parent
+        'ip': String,
+        'name': String,
+        'uptime': Number,
+        'active': Boolean,
+        'detections': {
+          type: Array,
+          default: function () {return []; },
+        },
+        'day': String,
+        'selected': Boolean,
+        'detection_index': Number,
+        'cfg': {
+          type: Object,
+          default: function () {
+            return {
+              detector: {allow: "", min_dev: 0, n_std: 0, threshold: 0},
+              recording: {save_video: 0, duty_cycle: 0, max_time: 0, min_time: 0, periodic_still: 0},
+              properties: {focus: 0},
+              rois: [],
+            };
+          },
+        },
+      },
+      data: function () {  // private to component
+        return {
+          cfg_edit: false,
+          selected_cfg: "",
+          selected_cfg_value: "",
+          selected_cfg_bg: "white",
+          roi_pts: [],
+          zoomed: false,
+          minute: -1,
+          detection: {
+            meta: {
+              detections: [],
+              filename: '',
+            },
+          },
+        }
+      },
+      mounted: function () {
+        this.canvas = document.getElementById(this.name + "canvas");
+        this.img = new Image();
+        this.ctx = this.canvas.getContext("2d");
+        this.draw_canvas();
+      },
+      template: '<div class="camera-view"></div>',
+      watch: {
+        selected_cfg: function (val) {
+          a = val.split(".");
+          obj = this.cfg;
+          for (i in a) {
+            obj = obj[a[i]];
+          };
+          this.selected_cfg_value = obj;
+          this.selected_cfg_bg = "white";
+        },
+        selected: function (val) {
+          if (!val) return;
+          img = document.getElementById(this.name + "canvas");
+          window.scrollTo(0, img.offsetTop);
+        },
+        detection_index: function (val) {
+          this.show_detection(this.detections[val]);
+        },
+        minute: function (val) {
+          this.draw_canvas();
+        },
+        active: function (val) {
+          this.draw_canvas();
+        },
+        cfg: function (val) {
+          console.log({cfg: val});
+          this.draw_canvas();
+        },
+        roi_pts: function (val) {
+          console.log({roi_pts: val});
+          // TODO resolve ROIs
+          prev = null;
+          rois = [];
+          for (i in this.roi_pts) {
+            if (prev === null) {
+              prev = this.roi_pts[i];
+            } else {
+              l = Math.min(prev[0], this.roi_pts[i][0]);
+              t = Math.min(prev[1], this.roi_pts[i][1]);
+              w = Math.abs(prev[0] - this.roi_pts[i][0]);
+              h = Math.abs(prev[1] - this.roi_pts[i][1]);
+              d = Math.min((w * width) / height, h);
+              rois.push([l, t, d]);
+              prev = null;
+            };
+          };
+          if (rois.length === 0) rois = null;
+          Vue.set(this.cfg, 'rois', rois);  // TODO not reactive
+          this.draw_canvas();
+        },
+      },
+      methods: {
+        validate_selected_cfg(evt) {
+          console.log({validate_selected_cfg: evt});
+          if (
+              (this.selected_cfg.length == 0) ||
+              (this.selected_cfg_value.length == 0)) {
+            this.selected_cfg_bg = "red";
+            return;
+          };
+          val = Number(this.selected_cfg_value);
+          if ((val === null) || (!isFinite(val))) {
+            this.selected_cfg_bg = "red";
+            return;
+          };
+          switch (this.selected_cfg) {
+            case "detector.min_dev":
+              minv = 0.0;
+              maxv = 1.0;
+              break;
+            case "detector.n_std":
+              minv = 0.0;
+              maxv = 100.0;
+              break;
+            case "detector.threshold":
+              minv = 0.0;
+              maxv = 1.0;
+              break;
+            case "recording.duty_cycle":
+              minv = 0.0;
+              maxv = 1.0;
+              break;
+            case "recording.max_time":
+              minv = 0.0;
+              maxv = 3600.0;
+              break;
+            case "recording.min_time":
+              minv = 0.0;
+              maxv = 3600.0;
+              break;
+            case "recording.post_time":
+              minv = 0.0;
+              maxv = 3600.0;
+              break;
+            case "recording.periodic_still":
+              minv = 0.0;
+              maxv = Infinity;
+              break;
+            case "recording.save_video":
+              minv = 0.0;
+              maxv = 1.0;
+              break;
+            case "properties.focus":
+              minv = 0.0;
+              maxv = 990.0;
+              break;
+          };
+          if ((val < minv) || (val > maxv)) {
+            this.selected_cfg_bg = "red";
+            return;
+          };
+          cfg = this.cfg;
+          a = this.selected_cfg.split(".");
+          if (a.length !== 2) {
+            this.selected_cfg_bg = "red";
+            return;
+          };
+          key = a[0];
+          attr = a[1];
+          Vue.set(this.cfg[key], attr, val);
+          this.selected_cfg_bg = "green";
+        },
+        draw_canvas() {
+          console.log({draw_canvas: this});
+          this.img.onload = () => {
+            width = this.canvas.width;
+            height = this.canvas.height;
+            this.ctx.drawImage(this.img, 0, 0, width, height);
+            // draw ROIs
+            if (this.cfg.rois === null) {
+              rois = [[0.125, 0, 1.0],];
+            } else {
+              rois = this.cfg.rois;
+            };
+            for (i in rois) {
+              roi = rois[i];
+              this.ctx.strokeStyle = '#0000FF';
+              this.ctx.lineWidth = 3;
+              this.ctx.strokeRect(
+                roi[0] * width,
+                roi[1] * height,
+                roi[2] * height,
+                roi[2] * height);
+            };
+            if (this.cfg_edit) {
+              this.ctx.strokeStyle = '#00FF00';
+              this.ctx.lineWidth = 3;
+              for (i in this.roi_pts) {
+                pt = this.roi_pts[i];
+                this.ctx.strokeRect(pt[0] * width, pt[1] * height, 3, 3);
+              };
+            };
+            // draw not active
+            if (!this.active) {
+              this.ctx.strokeStyle = '#FF0000';
+              this.ctx.lineWidth = 10;
+              this.ctx.strokeRect(5, 5, width - 5, height - 5);
+            };
+          };
+          // append random junk to prevent browser caching
+          this.img.src = this.snapshot_url + '?junk=' + Math.random();
+        },
+        canvas_click(evt) {
+          if (!this.cfg_edit) return;
+          console.log({canvas_click: evt});
+          if (evt.shiftKey) {  // remove
+            this.roi_pts.pop();
+            return;
+          };
+          rect = evt.target.getBoundingClientRect();
+          x = (evt.clientX - rect.left) / rect.width;
+          y = (evt.clientY - rect.top) / rect.height;
+          console.log({x: x, y: y});
+          this.roi_pts.push([x, y]);
+        },
+        clear_rois() {
+          Vue.set(this.cfg, 'rois', null);
+          this.roi_pts = [];
+          this.draw_canvas();  // TODO change above isn't reactive
+        },
+        commit_cfg() {
+          // TODO validate config
+          // send current config to website
+          console.log({commit_cfg: this.cfg});
+          // TODO have a 'dirty' flag?
+          url = '/cfg/' + this.name;
+          fetch(url, {
+            method: 'POST', body: JSON.stringify(this.cfg),
+            headers: {
+              'Content-type': 'application/json',
+            },
+          }).then((response) => {
+            if (response.status !== 200) console.log({error: response});
+          });
+        },
+        clone_cfg() {
+          // TODO validate config
+          // commit config to all cameras
+          // send current config to website
+          console.log({clone_cfg: this.cfg});
+          // TODO have a 'dirty' flag?
+          url = '/cfg';
+          fetch(url, {
+            method: 'POST', body: JSON.stringify(this.cfg),
+            headers: {
+              'Content-type': 'application/json',
+            },
+          }).then((response) => {
+            if (response.status !== 200) console.log({error: response});
+            // reload configs (by reloading page)
+            location.reload();
+          });
+        },
+        now_x() {
+          d = new Date();
+          return (d.getHours() * 60 + d.getMinutes()) / 2 + 'px';
+        },
+        zoom(evt) {
+          console.log({zoom: evt});
+          el = document.getElementById("overlay");
+          if (evt === undefined) {
+            if (el.style.display === "none") return;
+            if (!this.zoomed) return;
+            el.style.backgroundImage = "url(" + this.snapshot_url + ")";
+          };
+          if (evt.type === "mouseout") {
+            this.zoomed = false;
+            el.style.display = "none";
+            return;
+          };
+          this.zoomed = true;
+          img = document.getElementById(this.name + "canvas");
+          el.style.left = img.offsetLeft + img.offsetWidth + 'px';
+          y = img.offsetTop;
+          if (y + el.offsetHeight >= document.body.clientHeight) {
+            y -= (el.offsetHeight - img.offsetHeight);
+            if (y < 0) {
+              y = img.offsetTop;
+            };
+          };
+          el.style.top = y + 'px';
+          el.style.display = "inline-block";
+          el.style.backgroundImage = "url(" + this.snapshot_url + ")";
+          posX = evt.offsetX ? (evt.offsetX) : evt.pageX - img.offsetLeft;
+          posY = evt.offsetY ? (evt.offsetY) : evt.pageY - img.offsetTop;
+          el.style.backgroundPosition = (-posX * 5) + "px " + (-posY * 6) + "px";
+        },
+        strip_mnt(path) {
+          if (path == undefined) return "";
+          return '/' + path.split('/').slice(2).join('/');
+        },
+        detection_to_x(detection) {
+          ts = detection.split('_')[0].split('/').slice(-1)[0];
+          return (Number(ts.slice(0, 2)) * 60 + Number(ts.slice(2, 4))) / 2;
+        },
+        show_detection(detection) {
+          console.log({show_detection: detection});
+          url = '/' + detection.split('/').slice(2).join('/');
+          fetch(url).then((response) => {
+            if (response.status !== 200) return;
+            response.json().then((data) => {
+              this.detection = data;
+            });
+          });
+          ts = detection.split("_")[0].split("/").slice(-1)[0]
+          this.minute = Number(ts.slice(0, 2)) * 60 + Number(ts.slice(2, 4));
+          this.zoom();
+        },
+        select_time(evt) {
+          svg = evt.currentTarget;
+          pt = svg.createSVGPoint();
+          pt.x = evt.clientX;
+          pt.y = evt.clientY;
+          cpt = pt.matrixTransform(svg.getScreenCTM().inverse());
+          this.minute = cpt.x * 2;
+          //hr = Math.floor(this.minute / 60);
+          //min = this.minute - (hr * 60);
+        },
+      },
+      computed: {
+        timestamp() {
+          if (this.minute == -1) return this.day;
+          hr = Math.floor(this.minute / 60);
+          min = this.minute - (hr * 60);
+          return `${this.day}T${(hr + '').padStart(2, '0')}:${(min + '').padStart(2, '0')}`;
+        },
+        snapshot_url() {
+          return `/snapshot/${this.name}/${this.timestamp}?${page_timestamp}`;
+        },
+        stills_url() {
+          return `/data/${this.name}/${this.day}/pic_001/`;
+        },
+        detections_url() {
+          return `/data/detections/${this.name}/${this.day.replace(/-/g, '').slice(2, 8)}/`;
+        },
+        overview_url() {
+          return `/data/overviews/${this.name}/${this.name}_${this.day}.mp4`;
+        },
+        videos_url() {
+          return `/data/videos/${this.name}/${this.day.replace(/-/g, '').slice(2, 8)}/`;
+        },
+        uptime_string() {
+          denom = 1;
+          unit = ' seconds';
+          if (this.uptime >= 86400) {
+            denom = 86400;
+            unit = ' days';
+          } else if (this.uptime >= 3600) {
+            denom = 3600;
+            unit = ' hours';
+          } else if (this.uptime >= 60) {
+            denom = 60;
+            unit = ' minutes';
+          };
+          return Math.floor(this.uptime / denom) + unit;
+        },
+      },
+    });
+
+    var vm = new Vue({
+      el: '#vm',
+      data: {
+        day: '',
+        camera_index: 0,
+        cameras: [],
+        temperature: -1.0,
+        disk_usage: {
+          total: -1,
+          used: -1,
+          free: -1,
+        },
+      },
+      computed: {
+        disk_usage_style() {
+          perc = 100 * (this.disk_usage.used / this.disk_usage.total);
+          return {
+            display: 'inline-block',
+            width: '250px',
+            background: `linear-gradient(to right, tomato 0%, tomato ${perc}%, lightcyan ${perc}%, lightcyan 100%)`,
+          };
+        },
+      },
+      methods: {
+        keydown(evt) {
+          console.log({keydown: evt});
+          if (evt.target !== document.body) return;
+          ci = 0;
+          di = 0;
+          switch (evt.key) {
+            case 'w':
+              ci = -1;
+              break;
+            case 's':
+              ci = 1;
+              break;
+            case 'd':
+              di = 1;
+              break;
+            case 'a':
+              di = -1;
+              break;
+          };
+          if (ci !== 0) {
+            c = this.cameras[this.camera_index];
+            c.selected = false;
+            Vue.set(this.cameras, this.camera_index, c);
+            this.camera_index = (this.camera_index + ci + this.cameras.length) % this.cameras.length;
+            c = this.cameras[this.camera_index];
+            c.selected = true;
+            Vue.set(this.cameras, this.camera_index, c);
+          };
+          if (di != 0) {
+            c = this.cameras[this.camera_index];
+            if (isNaN(c.detection_index)) {
+              if (di == 1) {
+                i = 0;
+              } else {
+                i = c.detections.length - 1;
+              };
+            } else {
+              i = (c.detection_index + di + c.detections.length) % c.detections.length
+            };
+            if (i == -1) return;
+            c.detection_index = i;
+            Vue.set(this.cameras, this.camera_index, c);
+          };
+        },
+        sync(evt) {
+          console.log({sync: [this, evt]});
+          if (evt !== undefined) {
+            this.day = evt.target.value;
+          };
+          if (this.day.length > 0) {
+            date_str = '/' + this.day;
+          } else {
+            date_str = '';
+          };
+          base = "http://" + window.location.host;
+          fetch(base + '/cameras' + date_str).then((response) => {
+            if (response.status !== 200) return;
+            response.json().then((data) => {
+              console.log({cameras_sync: data});
+              this.cameras = data;
+              this.camera_index = 0;
+              this.cameras[0].selected = true;
+            });
+          });
+          fetch(base + '/temperature').then((response) => {
+            if (response.status !== 200) return;
+            response.json().then((data) => {
+              this.temperature = data;
+            });
+          });
+          fetch(base + '/disk_usage').then((response) => {
+            if (response.status !== 200) return;
+            response.json().then((data) => {
+              this.disk_usage = data;
+            });
+          });
+        },
+      },
+      created() {
+        // TODO get image without syncing config
+        // setInterval(this.sync, 2000);
+        return this.sync()
+      },
+    });
+    document.addEventListener('keydown', vm.keydown);
+  </script>
+</body>
+</html>

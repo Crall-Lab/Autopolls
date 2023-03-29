@@ -1,0 +1,16 @@
+[Unit]
+Description=pollinatorcamera discover
+After=network.target
+
+[Service]
+User=pi
+Group=pi
+ExecStart=~/r/braingram/pollinatorcam/services/run_discover.sh
+#TODO make this a timer
+RestartSec=300
+Restart=always
+StandardOutput=file:/mnt/data/logs/discover.out
+StandardError=file:/mnt/data/logs/discover.err
+
+[Install]
+WantedBy=multi-user.target

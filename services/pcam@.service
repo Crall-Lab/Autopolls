@@ -1,0 +1,16 @@
+[Unit]
+Description=pollinatorcamera[%i]
+After=network.target
+
+[Service]
+User=pi
+Group=pi
+ExecStart=/home/pi/r/braingram/pollinatorcam/services/run_pcam.sh %i
+RestartSec=60
+Restart=always
+StandardOutput=file:/mnt/data/logs/%i.out
+StandardError=file:/mnt/data/logs/%i.err
+WatchdogSec=30
+
+[Install]
+WantedBy=multi-user.target

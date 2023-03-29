@@ -1,0 +1,12 @@
+[Unit]
+Description=tfliteserve server
+After=network.target
+
+[Service]
+User=pi
+ExecStart=~/r/braingram/pollinatorcam/services/run_tfliteserve.sh
+RestartSec=10
+Restart=always
+
+[Install]
+WantedBy=multi-user.target

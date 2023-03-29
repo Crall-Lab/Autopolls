@@ -1,0 +1,9 @@
+[Unit]
+Description=Run pcam overview generator every day
+
+[Timer]
+OnCalendar=daily
+Unit=pcam-overview.service
+
+[Install]
+WantedBy=multi-user.target

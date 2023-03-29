@@ -1,0 +1,13 @@
+[Unit]
+Description=uWSGI instance to serve pcam ui
+After=network.target nginx.service systemd-tmpfiles-setup.service
+
+[Service]
+User=pi
+Group=pi
+WorkingDirectory=~/r/braingram/pollinatorcam
+ExecStart=/bin/bash -c "PATH=~.virtualenvs/pollinatorcam/bin:$PATH exec ~.virtualenvs/pollinatorcam/bin/uwsgi --ini pcam-ui.ini"
+
+[Install]
+WantedBy=multi-user.target
+

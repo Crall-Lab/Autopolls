@@ -1,0 +1,15 @@
+[Unit]
+Description=pymicroclimate weather logging service
+After=network.target
+
+[Service]
+User=pi
+Group=pi
+ExecStart=/bin/bash -c "PATH=/home/pi/.virtualenvs/pollinatorcam/bin:$PATH python3 -m pymicroclimate"
+RestartSec=300
+Restart=always
+StandardOutput=file:/mnt/data/logs/weather.out
+StandardError=file:/mnt/data/logs/weather.err
+
+[Install]
+WantedBy=multi-user.target

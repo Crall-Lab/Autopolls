@@ -1,0 +1,21 @@
+server {
+  listen 80;
+  listen [::]:80 default_server;
+  server_name _;
+  auth_basic "Login required";
+  auth_basic_user_file /etc/apache2/.htpasswd;
+  
+  index index.html index.htm index.nginx-debian.html;
+
+  location /data {
+    rewrite ^/data/(.*) /$1 break;
+    autoindex on;
+    root /mnt/data;
+    try_files $uri $uri/ =404;
+  }
+
+  location / {
+    include uwsgi_params;
+    uwsgi_pass unix:/tmp/pcam-ui.sock;
+  }
+}
