@@ -14,6 +14,7 @@ must be at the TOP of your bashrc (before the 'If not running interactively'... 
 You may have to use nano in the terminal to make these edits:
 
 TODO 
+
 -make a PCAM_HOME environment variable to make switching forks easier
 
 -remove pcam section for usb autopolls version
@@ -40,9 +41,9 @@ sudo nano /etc/hostname
 Prepare for and clone this repository
 ```bash
 . ~/.bashrc
-mkdir -p ~/r/braingram
-cd ~/r/braingram
-git clone https://github.com/mattsmiths/pollinatorcam.git -b detection_network
+mkdir -p ~/scripts
+cd ~/scripts
+git clone https://github.com/Crall-Lab/Autopolls.git
 ```
 
 # Install pre-requisites
@@ -65,8 +66,7 @@ echo "source ~/.virtualenvs/pollinatorcam/bin/activate" >> ~/.bashrc
 # Install tfliteserve
 
 ```bash
-mkdir -p ~/r/braingram
-cd ~/r/braingram
+cd ~/scripts
 git clone https://github.com/braingram/tfliteserve.git
 cd tfliteserve
 
@@ -88,7 +88,7 @@ tar xvJf 200123_2035_model.tar.xz
 # Install this repository
 
 ```bash
-cd ~/r/braingram/pollinatorcam
+cd ~/scripts/Autopolls
 pip install -e .
 pip install uwsgi
 ```
@@ -140,7 +140,7 @@ sudo ln -s ~/r/braingram/pollinatorcam/services/pcam-ui.nginx /etc/nginx/sites-e
 NOTE: the overview service and timer are not needed for usb cameras.
 
 ```bash
-cd ~/r/braingram/pollinatorcam/services
+cd ~/scripts/Autopolls/services
 for S in \
     tfliteserve.service \
     pcam-discover.service \
@@ -148,7 +148,7 @@ for S in \
     pcam-overview.timer \
     pcam@.service \
     pcam-ui.service; do \
-  sudo ln -s ~/r/braingram/pollinatorcam/services/$S /etc/systemd/system/$S
+  sudo ln -s ~/scripts/Autopolls/services/$S /etc/systemd/system/$S
 done
 # enable services to run on boot
 for S in \
@@ -178,8 +178,8 @@ cd ~/daqhats
 sudo ./install.sh
 ```
 ```bash
-sudo chmod 775 ~/r/braingram/pollinatorcam/tempSensor.py
-sudo mv ~/r/braingram/pollinatorcam/tempSensor.py ~/daqhats/examples/python/mcc134/tempSensor.py
+sudo chmod 775 ~/scripts/Autopolls/tempSensor.py
+sudo mv ~/scripts/Autopolls/tempSensor.py ~/daqhats/examples/python/mcc134/tempSensor.py
 ```
 Open crontab and add this line
 ```bash
@@ -196,7 +196,7 @@ wget http://www.uugear.com/repo/WittyPi3/install.sh
 sudo sh install.sh
 ```
 ```bash
-sudo mv ~/r/braingram/pollinatorcam/schedule.wpi ~/wittypi/schedule.wpi
+sudo mv ~/scripts/Autopolls/schedule.wpi ~/wittypi/schedule.wpi
 sudo ./wittypi/runScript.sh
 ```
 
