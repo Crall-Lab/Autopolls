@@ -103,7 +103,7 @@ sudo mv ~/scripts/Autopolls/tflite_20220630_1/ ~/scripts/tfliteserve/tflite_2022
 Before running these lines, make sure to have your external USB device (e.g., thumb drive) connected to te pi
 
 This assumes you're using an external storage drive that shows up as /dev/sda1. One option is to setup the drive as ntfs.
-To format the drive as ntfs (to allow for >2TB volumes) in fdisk you will need to:
+To format the drive as ntfs (to allow for >2TB volumes) in fdisk you will need to: (you can check thumbdrive mounting location using - "sudo fdisk -l"
 ```bash
 # confirm /dev/sda is your external drive before proceeding
 # open fdisk
