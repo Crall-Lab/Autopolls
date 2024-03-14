@@ -94,18 +94,18 @@ pip install uwsgi
 Move latest object detection model to tfliteserve folder
 * Todo: clean for final models *
 ```bash
-sudo cp /home/pi/AP/pollinatorcam/tflite_20220630_1/ ~/r/braingram/tfliteserve/tflite_20220630_1 -r
+sudo cp /home/pi/AP/Autopolls/pollinatorcam/tflite_20220630_1/ /home/pi/AP/tfliteserve/tflite_20220630_1 -r
 sudo mkdir /home/pi/AP/tfliteserve/tflite_2023/
-sudo cp /home/pi/AP/pollinatorcam/testModels/ssd_mobilenetV2_fpnlite_UINT8_AP24.tflite /home/pi/AP/tfliteserve/tflite_2023/ssd_single.tflite
-sudo cp /home/pi/AP/pollinatorcam/testModels/ssd_mobilenetV2_fpnlite_UINT8_AP24_edgetpu.tflite /home/pi/AP/tfliteserve/tflite_2023/ssd_single_edge.tflite
-sudo cp /home/pi/AP/pollinatorcam/testModels/ssd_mobilenetV2_fpnlite_UINT8_AP26.tflite /home/pi/AP/tfliteserve/tflite_2023/ssd_multi.tflite
-sudo cp /home/pi/AP/pollinatorcam/testModels/ssd_mobilenetV2_fpnlite_UINT8_AP26_edgetpu.tflite /home/pi/AP/tfliteserve/tflite_2023/ssd_multi_edge.tflite
-sudo cp /home/pi/AP/pollinatorcam/testModels/ssd_mobilenetV2_fpnlite_UINT8_AP26_edgetpu.tflite /home/pi/AP/tfliteserve/tflite_2023/ssd_multi_edge.tflite
-sudo cp /home/pi/AP/pollinatorcam/testModels/ssd_mobilenetV2_fpnlite.txt /home/pi/AP/tfliteserve/tflite_2023/multi.txt
-sudo cp /home/pi/AP/pollinatorcam/tflite_20220630_1/labels.txt /home/pi/AP/tfliteserve/tflite_2023/single.txt
-sudo cp /home/pi/AP/pollinatorcam/configs /home/pi/Desktop/configs
+sudo cp /home/pi/AP/Autopolls/pollinatorcam/testModels/ssd_mobilenetV2_fpnlite_UINT8_AP24.tflite /home/pi/AP/tfliteserve/tflite_2023/ssd_single.tflite
+sudo cp /home/pi/AP/Autopolls/pollinatorcam/testModels/ssd_mobilenetV2_fpnlite_UINT8_AP24_edgetpu.tflite /home/pi/AP/tfliteserve/tflite_2023/ssd_single_edge.tflite
+sudo cp /home/pi/AP/Autopolls/pollinatorcam/testModels/ssd_mobilenetV2_fpnlite_UINT8_AP26.tflite /home/pi/AP/tfliteserve/tflite_2023/ssd_multi.tflite
+sudo cp /home/pi/AP/Autopolls/pollinatorcam/testModels/ssd_mobilenetV2_fpnlite_UINT8_AP26_edgetpu.tflite /home/pi/AP/tfliteserve/tflite_2023/ssd_multi_edge.tflite
+sudo cp /home/pi/AP/Autopolls/pollinatorcam/testModels/ssd_mobilenetV2_fpnlite_UINT8_AP26_edgetpu.tflite /home/pi/AP/tfliteserve/tflite_2023/ssd_multi_edge.tflite
+sudo cp /home/pi/AP/Autopolls/pollinatorcam/testModels/ssd_mobilenetV2_fpnlite.txt /home/pi/AP/tfliteserve/tflite_2023/multi.txt
+sudo cp /home/pi/AP/Autopolls/pollinatorcam/tflite_20220630_1/labels.txt /home/pi/AP/tfliteserve/tflite_2023/single.txt
+sudo cp /home/pi/AP/Autopolls/pollinatorcam/configs /home/pi/Desktop/configs
 sudo chmod 777 /home/pi/Desktop/configs
-sudo chmod 777 /home/pi/AP/tflite_2023/
+sudo chmod 777 /home/pi/AP/tfliteserve/tflite_2023/
 ```
 Install json reading package
 ```bash
@@ -150,7 +150,7 @@ sudo chmod 777 /etc/hostname
 ```bash
 sudo htpasswd -bc /etc/apache2/.htpasswd pcam $PCAM_PASSWORD
 sudo rm /etc/nginx/sites-enabled/default
-sudo ln -s ~/AP/pollinatorcam/services/pcam-ui.nginx /etc/nginx/sites-enabled/
+sudo ln -s /home/pi/AP/Autopolls/pollinatorcam/services/pcam-ui.nginx /etc/nginx/sites-enabled/
 ```
 
 # Setup systemd services
@@ -158,7 +158,7 @@ sudo ln -s ~/AP/pollinatorcam/services/pcam-ui.nginx /etc/nginx/sites-enabled/
 NOTE: the overview service and timer are not needed for usb cameras.
 
 ```bash
-cd ~/AP/pollinatorcam/services
+cd ~/AP/Autopolls/pollinatorcam/services
 for S in \
     tfliteserve.service \
     pcam-discover.service \
@@ -166,7 +166,7 @@ for S in \
     pcam-overview.timer \
     pcam@.service \
     pcam-ui.service; do \
-  sudo ln -s ~/AP/pollinatorcam/services/$S /etc/systemd/system/$S
+  sudo ln -s ~/AP/Autopolls/pollinatorcam/services/$S /etc/systemd/system/$S
 done
 # enable services to run on boot
 for S in \
@@ -196,8 +196,8 @@ cd ~/daqhats
 sudo ./install.sh
 ```
 ```bash
-sudo chmod 775 ~/AP/pollinatorcam/tempSensor.py
-sudo mv ~/AP/pollinatorcam/tempSensor.py ~/daqhats/examples/python/mcc134/tempSensor.py
+sudo chmod 775 ~/AP/Autopolls/pollinatorcam/tempSensor.py
+sudo mv ~/AP/Autopolls/pollinatorcam/tempSensor.py ~/daqhats/examples/python/mcc134/tempSensor.py
 ```
 Open crontab and add this line
 ```bash
@@ -215,7 +215,7 @@ wget http://www.uugear.com/repo/WittyPi4/install.sh
 sudo sh install.sh
 ```
 ```bash
-sudo mv ~/AP/pollinatorcam/schedule.wpi ~/wittypi/schedule.wpi
+sudo mv ~/AP/Autopolls/pollinatorcam/schedule.wpi ~/wittypi/schedule.wpi
 sudo ./wittypi/runScript.sh
 ```
 
