@@ -3,7 +3,15 @@ Installation notes
 
 # Install OS
 
-Install latest Pi OS (Desktop: tested March 2020)
+Install latest Pi OS (Desktop: tested May 25th, 2023)
+
+Test conditions:
+* Raspberry Pi 4 Model B Rev 1.5 [ 2GB ]
+* Raspberry Pi OS (32-bit, released 05-03-2023) - from raspberry pi imager
+* Raspbian GNU/Linux 11 (bullseye)
+* Debian version: 11.7
+* Kernel version: 6.1.21-v8+
+
 Setup locale, timezone, keyboard, hostname, ssh
 
 # Environment variables
@@ -13,16 +21,12 @@ the following in your ~/.bashrc (or wherever else is appropriate). Note this
 must be at the TOP of your bashrc (before the 'If not running interactively'... line).
 You may have to use nano in the terminal to make these edits:
 
-TODO 
-
--make a PCAM_HOME environment variable to make switching forks easier
-
--remove pcam section for usb autopolls version
-
+TODO make a PCAM_HOME environment variable to make switching forks easier
 ```bash
 sudo nano ~/.bashrc
 ```
 
+#Add custom user name and password for UI access
 ```bash
 export PCAM_USER="camera login user name"
 export PCAM_PASSWORD="camera login password"
@@ -30,20 +34,14 @@ export PCAM_NAS_USER="ftp server user"
 export PCAM_NAS_PASSWORD="ftp server password"
 ```
 
-Update the raspberry pi hostname with a unique ID of your choosing
-```bash
-sudo nano /etc/hostname
-# autopolls have the naming scheme "AP_XX", where XX is a number ie; 05
-```
-
 # Clone this repository
 
 Prepare for and clone this repository
 ```bash
 . ~/.bashrc
-mkdir -p ~/scripts
-cd ~/scripts
-git clone https://github.com/Crall-Lab/Autopolls.git
+mkdir -p ~/r/braingram
+cd ~/r/braingram
+git clone https://github.com/mattsmiths/pollinatorcam.git -b detection_network
 ```
 
 # Install pre-requisites
@@ -52,7 +50,6 @@ git clone https://github.com/Crall-Lab/Autopolls.git
 sudo apt update
 sudo apt install python3-numpy python3-opencv python3-requests python3-flask python3-systemd nginx-full vsftpd virtualenvwrapper apache2-utils python3-gst-1.0 gstreamer1.0-tools nmap
 echo "source /usr/share/virtualenvwrapper/virtualenvwrapper.sh" >> ~/.bashrc
-pip install setuptools==65.7.0
 ```
 
 # Setup virtualenv
@@ -67,7 +64,8 @@ echo "source ~/.virtualenvs/pollinatorcam/bin/activate" >> ~/.bashrc
 # Install tfliteserve
 
 ```bash
-cd ~/scripts
+mkdir -p ~/r/braingram
+cd ~/r/braingram
 git clone https://github.com/braingram/tfliteserve.git
 cd tfliteserve
 
@@ -89,21 +87,37 @@ tar xvJf 200123_2035_model.tar.xz
 # Install this repository
 
 ```bash
-cd ~/scripts/Autopolls
+cd ~/r/braingram/pollinatorcam
 pip install -e .
 pip install uwsgi
 ```
 Move latest object detection model to tfliteserve folder
+* Todo: clean for final models *
 ```bash
-sudo mv ~/scripts/Autopolls/tflite_20220630_1/ ~/scripts/tfliteserve/tflite_20220630_1
+sudo cp /home/pi/r/braingram/pollinatorcam/tflite_20220630_1/ ~/r/braingram/tfliteserve/tflite_20220630_1 -r
+sudo mkdir /home/pi/r/braingram/tfliteserve/tflite_2023/
+sudo cp /home/pi/r/braingram/pollinatorcam/testModels/ssd_mobilenetV2_fpnlite_UINT8_AP24.tflite /home/pi/r/braingram/tfliteserve/tflite_2023/ssd_single.tflite
+sudo cp /home/pi/r/braingram/pollinatorcam/testModels/ssd_mobilenetV2_fpnlite_UINT8_AP24_edgetpu.tflite /home/pi/r/braingram/tfliteserve/tflite_2023/ssd_single_edge.tflite
+sudo cp /home/pi/r/braingram/pollinatorcam/testModels/ssd_mobilenetV2_fpnlite_UINT8_AP26.tflite /home/pi/r/braingram/tfliteserve/tflite_2023/ssd_multi.tflite
+sudo cp /home/pi/r/braingram/pollinatorcam/testModels/ssd_mobilenetV2_fpnlite_UINT8_AP26_edgetpu.tflite /home/pi/r/braingram/tfliteserve/tflite_2023/ssd_multi_edge.tflite
+sudo cp /home/pi/r/braingram/pollinatorcam/testModels/ssd_mobilenetV2_fpnlite_UINT8_AP26_edgetpu.tflite /home/pi/r/braingram/tfliteserve/tflite_2023/ssd_multi_edge.tflite
+sudo cp /home/pi/r/braingram/pollinatorcam/testModels/ssd_mobilenetV2_fpnlite.txt /home/pi/r/braingram/tfliteserve/tflite_2023/multi.txt
+sudo cp /home/pi/r/braingram/pollinatorcam/tflite_20220630_1/labels.txt /home/pi/r/braingram/tfliteserve/tflite_2023/single.txt
+sudo cp /home/pi/r/braingram/pollinatorcam/configs /home/pi/Desktop/configs
+sudo chmod 777 /home/pi/Desktop/configs
+sudo chmod 777 /home/pi/r/braingram/tflite_2023/
+```
+Install json reading package
+```bash
+sudo apt-get install jq
 ```
 
 # Setup storage location
-
 Before running these lines, make sure to have your external USB device (e.g., thumb drive) connected to te pi
 
-This assumes you're using an external storage drive that shows up as /dev/sda1. One option is to setup the drive as ntfs.
-To format the drive as ntfs (to allow for >2TB volumes) in fdisk you will need to: (you can check thumbdrive mounting location using - "sudo fdisk -l"
+This assumes you're using an external storage drive that shows up as /dev/sda1. You can check thumbdrive mounting location using - "sudo fdisk -l"
+One option is to setup the drive as ntfs.
+To format the drive as ntfs (to allow for >2TB volumes) in fdisk you will need to do the following:
 ```bash
 # confirm /dev/sda is your external drive before proceeding
 # open fdisk
@@ -127,6 +141,7 @@ sudo mkdir -p /mnt/data/logs
 sudo chown pi /mnt/data
 sudo chgrp ftp /mnt/data
 sudo chmod 775 /mnt/data
+sudo chmod 777 /etc/hostname
 ```
 
 
@@ -143,7 +158,7 @@ sudo ln -s ~/r/braingram/pollinatorcam/services/pcam-ui.nginx /etc/nginx/sites-e
 NOTE: the overview service and timer are not needed for usb cameras.
 
 ```bash
-cd ~/scripts/Autopolls/services
+cd ~/r/braingram/pollinatorcam/services
 for S in \
     tfliteserve.service \
     pcam-discover.service \
@@ -151,7 +166,7 @@ for S in \
     pcam-overview.timer \
     pcam@.service \
     pcam-ui.service; do \
-  sudo ln -s ~/scripts/Autopolls/services/$S /etc/systemd/system/$S
+  sudo ln -s ~/r/braingram/pollinatorcam/services/$S /etc/systemd/system/$S
 done
 # enable services to run on boot
 for S in \
@@ -181,8 +196,8 @@ cd ~/daqhats
 sudo ./install.sh
 ```
 ```bash
-sudo chmod 775 ~/scripts/Autopolls/tempSensor.py
-sudo mv ~/scripts/Autopolls/tempSensor.py ~/daqhats/examples/python/mcc134/tempSensor.py
+sudo chmod 775 ~/r/braingram/pollinatorcam/tempSensor.py
+sudo mv ~/r/braingram/pollinatorcam/tempSensor.py ~/daqhats/examples/python/mcc134/tempSensor.py
 ```
 Open crontab and add this line
 ```bash
@@ -194,12 +209,13 @@ Confirm a folder in /home/pi/ titled "tempProbes" and a csv with a temp reading 
 # Install wittyPi libraries and script
 
 Attach the wittyPi on top of the thermocouples 40 pin GPIO, then run commands below
+If using an old wittyPi replace with "WittyPi3"
 ```bash
-wget http://www.uugear.com/repo/WittyPi3/install.sh
+wget http://www.uugear.com/repo/WittyPi4/install.sh
 sudo sh install.sh
 ```
 ```bash
-sudo mv ~/scripts/Autopolls/schedule.wpi ~/wittypi/schedule.wpi
+sudo mv ~/r/braingram/pollinatorcam/schedule.wpi ~/wittypi/schedule.wpi
 sudo ./wittypi/runScript.sh
 ```
 
@@ -221,3 +237,11 @@ username and password (like the default admin/admin).
 python3 -m pollinatorcam configure -i 10.1.1.153 -u admin -p admin
 ```
 
+# Viewing camera
+In the browser on the pi, you can view attached cameras and change parameters by connecting to the UI: open a browser, and type in "127.0.0.1"
+
+# If errors with systemD
+```bash
+pip3 install setuptools==65.7.0
+pip3 install systemd
+```
