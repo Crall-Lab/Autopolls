@@ -1,9 +1,9 @@
 #!/bin/bash
 
 source $HOME/.bashrc
-source $HOME/.virtualenvs/pollinatorcam/bin/activate
+source $HOME/.virtualenvs/autopolls/bin/activate
 
-cd $HOME/r/braingram/pollinatorcam
+cd $HOME/AP/pollinatorcam
 
 # TODO flag for usb vs IP cameras?
 #MY_IP=`ip -o -4 addr list eth0 | awk '{print $4}' | cut -d/ -f1`
