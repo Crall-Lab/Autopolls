@@ -1,3 +1,4 @@
+
 """
 Trigger:
     - takes in labels/predictions
@@ -37,7 +38,7 @@ from . import gstrecorder
 from . import cvrecorder
 
 hstname = open('/etc/hostname','r')
-hstname1 = hstname.readline().split('\n')[0]
+hstname1 = hstname.readlines()[-1].split('\n')[0]
 hstname.close()
 
 mask_consts = {
