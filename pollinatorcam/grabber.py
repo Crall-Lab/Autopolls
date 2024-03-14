@@ -72,8 +72,8 @@ default_cfg = {
         #'frame_height': 480,
 
         'autofocus': 0,
-        'focus': 0.3, #356 - need to check raspbian OS for latest compatibility for focus parameters
-
+        'focus': 356, #356 - need to check raspbian OS for latest compatibility for focus parameters
+        # 1 - 999: with larger values moving focal distance closer
         #'frame_width': 640,
         #'frame_height': 480,
     },
@@ -81,6 +81,27 @@ default_cfg = {
 
 data_dir = '/mnt/data/'
 
+# Loading in new config file settings
+customSetting = '/home/pi/Desktop/configs'
+if os.path.isfile(customSetting):
+    in1 = open(customSetting,'r')
+    settingsL = json.load(in1)
+    in1.close()
+	
+    # Override default settings with config file
+    default_cfg['properties']['autofocus'] = settingsL['autofocus']
+    default_cfg['properties']['focus'] = settingsL['focus']
+    default_cfg['recording']['periodic_still'] = settingsL['periodic_still']
+    default_cfg['detector']['threshold'] = settingsL['threshold']
+
+    # Change hostname to match config file
+    names = open('/etc/hostname','r')
+    names1 = names.readlines()
+    names.close()
+    if names1[-1].split('\n')[0] != settingsL['hostname']:
+        names = open('/etc/hostname','a')
+        names.write(settingsL['hostname']+'\n')
+        names.close() 
 
 class Grabber:
     def __init__(
@@ -305,7 +326,8 @@ class Grabber:
             #print(im.mean())
             #t = im.mean() < 100
             if time.monotonic() - self.last_detection > 5.0:
-                set_trigger = not self.trigger.active
+                set_trigger = False # Updating for turning off inference
+                #set_trigger = not self.trigger.active
                 logging.info("Faking detection, flipping trigger to %s" % set_trigger)
                 self.last_detection = time.monotonic()
         else:
@@ -343,10 +365,14 @@ class Grabber:
                         label_id = int(r[0])
                         score = r[1]
                         if label_id >= self.n_classes:
-                            print(
-                                "Invliad label_id[%s] > number of classes[%s]" %
-                                (label_id, self.n_classes))
-                            continue
+                            # Conditional for new FPN models 1-class behavior
+                            if self.n_classes != 2:
+                                print(
+                                    "Invliad label_id[%s] > number of classes[%s]" %
+                                    (label_id, self.n_classes))
+                                continue
+                            else:
+                                label_id = 0
                         o[0, label_id] = max(o[0, label_id], score)
                         if label_id not in bboxes:
                             bboxes[label_id] = []
