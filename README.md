@@ -39,9 +39,9 @@ export PCAM_NAS_PASSWORD="ftp server password"
 Prepare for and clone this repository
 ```bash
 . ~/.bashrc
-mkdir -p ~/r/braingram
-cd ~/r/braingram
-git clone https://github.com/mattsmiths/pollinatorcam.git -b detection_network
+mkdir -p ~/AP
+cd ~/AP
+git clone https://github.com/Crall-Lab/Autopolls.git
 ```
 
 # Install pre-requisites
@@ -56,16 +56,16 @@ echo "source /usr/share/virtualenvwrapper/virtualenvwrapper.sh" >> ~/.bashrc
 
 ```bash
 . ~/.bashrc
-mkvirtualenv --system-site-packages pollinatorcam -p `which python3`
-workon pollinatorcam
-echo "source ~/.virtualenvs/pollinatorcam/bin/activate" >> ~/.bashrc
+mkvirtualenv --system-site-packages autopolls -p `which python3`
+workon autopolls
+echo "source ~/.virtualenvs/autopolls/bin/activate" >> ~/.bashrc
 ```
 
 # Install tfliteserve
 
 ```bash
-mkdir -p ~/r/braingram
-cd ~/r/braingram
+mkdir -p ~/AP
+cd ~/AP
 git clone https://github.com/braingram/tfliteserve.git
 cd tfliteserve
 
@@ -87,25 +87,25 @@ tar xvJf 200123_2035_model.tar.xz
 # Install this repository
 
 ```bash
-cd ~/r/braingram/pollinatorcam
+cd ~/AP/Autopolls
 pip install -e .
 pip install uwsgi
 ```
 Move latest object detection model to tfliteserve folder
 * Todo: clean for final models *
 ```bash
-sudo cp /home/pi/r/braingram/pollinatorcam/tflite_20220630_1/ ~/r/braingram/tfliteserve/tflite_20220630_1 -r
-sudo mkdir /home/pi/r/braingram/tfliteserve/tflite_2023/
-sudo cp /home/pi/r/braingram/pollinatorcam/testModels/ssd_mobilenetV2_fpnlite_UINT8_AP24.tflite /home/pi/r/braingram/tfliteserve/tflite_2023/ssd_single.tflite
-sudo cp /home/pi/r/braingram/pollinatorcam/testModels/ssd_mobilenetV2_fpnlite_UINT8_AP24_edgetpu.tflite /home/pi/r/braingram/tfliteserve/tflite_2023/ssd_single_edge.tflite
-sudo cp /home/pi/r/braingram/pollinatorcam/testModels/ssd_mobilenetV2_fpnlite_UINT8_AP26.tflite /home/pi/r/braingram/tfliteserve/tflite_2023/ssd_multi.tflite
-sudo cp /home/pi/r/braingram/pollinatorcam/testModels/ssd_mobilenetV2_fpnlite_UINT8_AP26_edgetpu.tflite /home/pi/r/braingram/tfliteserve/tflite_2023/ssd_multi_edge.tflite
-sudo cp /home/pi/r/braingram/pollinatorcam/testModels/ssd_mobilenetV2_fpnlite_UINT8_AP26_edgetpu.tflite /home/pi/r/braingram/tfliteserve/tflite_2023/ssd_multi_edge.tflite
-sudo cp /home/pi/r/braingram/pollinatorcam/testModels/ssd_mobilenetV2_fpnlite.txt /home/pi/r/braingram/tfliteserve/tflite_2023/multi.txt
-sudo cp /home/pi/r/braingram/pollinatorcam/tflite_20220630_1/labels.txt /home/pi/r/braingram/tfliteserve/tflite_2023/single.txt
-sudo cp /home/pi/r/braingram/pollinatorcam/configs /home/pi/Desktop/configs
+sudo cp /home/pi/AP/pollinatorcam/tflite_20220630_1/ ~/r/braingram/tfliteserve/tflite_20220630_1 -r
+sudo mkdir /home/pi/AP/tfliteserve/tflite_2023/
+sudo cp /home/pi/AP/pollinatorcam/testModels/ssd_mobilenetV2_fpnlite_UINT8_AP24.tflite /home/pi/AP/tfliteserve/tflite_2023/ssd_single.tflite
+sudo cp /home/pi/AP/pollinatorcam/testModels/ssd_mobilenetV2_fpnlite_UINT8_AP24_edgetpu.tflite /home/pi/AP/tfliteserve/tflite_2023/ssd_single_edge.tflite
+sudo cp /home/pi/AP/pollinatorcam/testModels/ssd_mobilenetV2_fpnlite_UINT8_AP26.tflite /home/pi/AP/tfliteserve/tflite_2023/ssd_multi.tflite
+sudo cp /home/pi/AP/pollinatorcam/testModels/ssd_mobilenetV2_fpnlite_UINT8_AP26_edgetpu.tflite /home/pi/AP/tfliteserve/tflite_2023/ssd_multi_edge.tflite
+sudo cp /home/pi/AP/pollinatorcam/testModels/ssd_mobilenetV2_fpnlite_UINT8_AP26_edgetpu.tflite /home/pi/AP/tfliteserve/tflite_2023/ssd_multi_edge.tflite
+sudo cp /home/pi/AP/pollinatorcam/testModels/ssd_mobilenetV2_fpnlite.txt /home/pi/AP/tfliteserve/tflite_2023/multi.txt
+sudo cp /home/pi/AP/pollinatorcam/tflite_20220630_1/labels.txt /home/pi/AP/tfliteserve/tflite_2023/single.txt
+sudo cp /home/pi/AP/pollinatorcam/configs /home/pi/Desktop/configs
 sudo chmod 777 /home/pi/Desktop/configs
-sudo chmod 777 /home/pi/r/braingram/tflite_2023/
+sudo chmod 777 /home/pi/AP/tflite_2023/
 ```
 Install json reading package
 ```bash
@@ -150,7 +150,7 @@ sudo chmod 777 /etc/hostname
 ```bash
 sudo htpasswd -bc /etc/apache2/.htpasswd pcam $PCAM_PASSWORD
 sudo rm /etc/nginx/sites-enabled/default
-sudo ln -s ~/r/braingram/pollinatorcam/services/pcam-ui.nginx /etc/nginx/sites-enabled/
+sudo ln -s ~/AP/pollinatorcam/services/pcam-ui.nginx /etc/nginx/sites-enabled/
 ```
 
 # Setup systemd services
@@ -158,7 +158,7 @@ sudo ln -s ~/r/braingram/pollinatorcam/services/pcam-ui.nginx /etc/nginx/sites-e
 NOTE: the overview service and timer are not needed for usb cameras.
 
 ```bash
-cd ~/r/braingram/pollinatorcam/services
+cd ~/AP/pollinatorcam/services
 for S in \
     tfliteserve.service \
     pcam-discover.service \
@@ -166,7 +166,7 @@ for S in \
     pcam-overview.timer \
     pcam@.service \
     pcam-ui.service; do \
-  sudo ln -s ~/r/braingram/pollinatorcam/services/$S /etc/systemd/system/$S
+  sudo ln -s ~/AP/pollinatorcam/services/$S /etc/systemd/system/$S
 done
 # enable services to run on boot
 for S in \
@@ -196,8 +196,8 @@ cd ~/daqhats
 sudo ./install.sh
 ```
 ```bash
-sudo chmod 775 ~/r/braingram/pollinatorcam/tempSensor.py
-sudo mv ~/r/braingram/pollinatorcam/tempSensor.py ~/daqhats/examples/python/mcc134/tempSensor.py
+sudo chmod 775 ~/AP/pollinatorcam/tempSensor.py
+sudo mv ~/AP/pollinatorcam/tempSensor.py ~/daqhats/examples/python/mcc134/tempSensor.py
 ```
 Open crontab and add this line
 ```bash
@@ -215,7 +215,7 @@ wget http://www.uugear.com/repo/WittyPi4/install.sh
 sudo sh install.sh
 ```
 ```bash
-sudo mv ~/r/braingram/pollinatorcam/schedule.wpi ~/wittypi/schedule.wpi
+sudo mv ~/AP/pollinatorcam/schedule.wpi ~/wittypi/schedule.wpi
 sudo ./wittypi/runScript.sh
 ```
 
@@ -226,15 +226,6 @@ You can run the following to see what devices were found.
 
 ```bash
 python3 -m pollinatorcam discover -p
-```
-
-When new IP cameras are connected, they will need to be configured. If this is
-the first time the camera is configured, you may need to provide a different
-username and password (like the default admin/admin).
-
-```bash
-# if camera ip is 10.1.1.153
-python3 -m pollinatorcam configure -i 10.1.1.153 -u admin -p admin
 ```
 
 # Viewing camera
