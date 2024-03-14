@@ -3,7 +3,7 @@
 source $HOME/.bashrc
 source $HOME/.virtualenvs/autopolls/bin/activate
 
-cd $HOME/AP/pollinatorcam
+cd $HOME/AP/Autopolls/pollinatorcam
 
 # exec here to use same PID to allow systemd watchdog
 #exec python3 -m pollinatorcam -l $1 -rdD
