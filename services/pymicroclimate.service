@@ -5,7 +5,7 @@ After=network.target
 [Service]
 User=pi
 Group=pi
-ExecStart=/bin/bash -c "PATH=/home/pi/.virtualenvs/pollinatorcam/bin:$PATH python3 -m pymicroclimate"
+ExecStart=/bin/bash -c "PATH=/home/pi/.virtualenvs/autopolls/bin:$PATH python3 -m pymicroclimate"
 RestartSec=300
 Restart=always
 StandardOutput=file:/mnt/data/logs/weather.out
