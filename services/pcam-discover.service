@@ -5,7 +5,7 @@ After=network.target
 [Service]
 User=pi
 Group=pi
-ExecStart=/home/pi/AP/Autopolls/pollinatorcam/services/run_discover.sh
+ExecStart=/home/pi/AP/Autopolls/services/run_discover.sh
 #TODO make this a timer
 RestartSec=300
 Restart=always
