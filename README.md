@@ -158,7 +158,7 @@ sudo ln -s /home/pi/AP/Autopolls/pollinatorcam/services/pcam-ui.nginx /etc/nginx
 NOTE: the overview service and timer are not needed for usb cameras.
 
 ```bash
-cd ~/AP/Autopolls/pollinatorcam/services
+cd ~/AP/Autopolls/services
 for S in \
     tfliteserve.service \
     pcam-discover.service \
