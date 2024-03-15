@@ -4,7 +4,7 @@ After=network.target
 
 [Service]
 User=pi
-ExecStart=/home/pi/AP/Autopolls/pollinatorcam/services/run_tfliteserve.sh
+ExecStart=/home/pi/AP/Autopolls/services/run_tfliteserve.sh
 RestartSec=10
 Restart=always
 
