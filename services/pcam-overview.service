@@ -4,7 +4,7 @@ After=network.target
 
 [Service]
 User=pi
-ExecStart=python3 /home/pi/AP/Autopolls/pollinatorcam/services/overview.py
+ExecStart=python3 /home/pi/AP/Autopolls/services/overview.py
 StandardOutput=file:/mnt/data/logs/overview.out
 StandardError=file:/mnt/data/logs/overview.err
 
