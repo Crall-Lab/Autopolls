@@ -5,7 +5,7 @@ After=network.target nginx.service systemd-tmpfiles-setup.service
 [Service]
 User=pi
 Group=pi
-WorkingDirectory=/home/pi/AP/Autopolls/pollinatorcam
+WorkingDirectory=/home/pi/AP/Autopolls/
 ExecStart=/bin/bash -c "PATH=~.virtualenvs/autopolls/bin:$PATH exec ~.virtualenvs/autopolls/bin/uwsgi --ini pcam-ui.ini"
 
 [Install]
