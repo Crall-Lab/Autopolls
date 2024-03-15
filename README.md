@@ -150,7 +150,7 @@ sudo chmod 777 /etc/hostname
 ```bash
 sudo htpasswd -bc /etc/apache2/.htpasswd pcam $PCAM_PASSWORD
 sudo rm /etc/nginx/sites-enabled/default
-sudo ln -s /home/pi/AP/Autopolls/pollinatorcam/services/pcam-ui.nginx /etc/nginx/sites-enabled/
+sudo ln -s /home/pi/AP/Autopolls/services/pcam-ui.nginx /etc/nginx/sites-enabled/
 ```
 
 # Setup systemd services
@@ -166,7 +166,7 @@ for S in \
     pcam-overview.timer \
     pcam@.service \
     pcam-ui.service; do \
-  sudo ln -s ~/AP/Autopolls/pollinatorcam/services/$S /etc/systemd/system/$S
+  sudo ln -s ~/AP/Autopolls/services/$S /etc/systemd/system/$S
 done
 # enable services to run on boot
 for S in \
@@ -196,8 +196,8 @@ cd ~/daqhats
 sudo ./install.sh
 ```
 ```bash
-sudo chmod 775 ~/AP/Autopolls/pollinatorcam/tempSensor.py
-sudo mv ~/AP/Autopolls/pollinatorcam/tempSensor.py ~/daqhats/examples/python/mcc134/tempSensor.py
+sudo chmod 775 ~/AP/Autopolls/tempSensor.py
+sudo mv ~/AP/Autopolls/tempSensor.py ~/daqhats/examples/python/mcc134/tempSensor.py
 ```
 Open crontab and add this line
 ```bash
@@ -215,7 +215,7 @@ wget http://www.uugear.com/repo/WittyPi4/install.sh
 sudo sh install.sh
 ```
 ```bash
-sudo mv ~/AP/Autopolls/pollinatorcam/schedule.wpi ~/wittypi/schedule.wpi
+sudo mv ~/AP/Autopolls/schedule.wpi ~/wittypi/schedule.wpi
 sudo ./wittypi/runScript.sh
 ```
 
