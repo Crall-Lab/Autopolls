@@ -3,7 +3,7 @@
 source $HOME/.bashrc
 source $HOME/.virtualenvs/autopolls/bin/activate
 
-cd $HOME/AP/Autopolls/pollinatorcam
+cd $HOME/AP/Autopolls
 
 # TODO flag for usb vs IP cameras?
 #MY_IP=`ip -o -4 addr list eth0 | awk '{print $4}' | cut -d/ -f1`
