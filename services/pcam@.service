@@ -5,7 +5,7 @@ After=network.target
 [Service]
 User=pi
 Group=pi
-ExecStart=/home/pi/AP/Autopolls/pollinatorcam/services/run_pcam.sh %i
+ExecStart=/home/pi/AP/Autopolls/services/run_pcam.sh %i
 RestartSec=60
 Restart=always
 StandardOutput=file:/mnt/data/logs/%i.out
