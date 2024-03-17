@@ -49,8 +49,9 @@ class CVCaptureThread(threading.Thread):
     def set_properties(self, properties, retries=5):
         # reorder list of property names to have some elements first
         pnames = list(properties.keys())
+        AutoChk = False
         fi = 0
-        for k in ('fourcc', 'frame_width', 'frame_height'):
+        for k in ('fourcc', 'frame_width', 'frame_height','autofocus'):
             if k in pnames:
                 i = pnames.index(k)
                 pnames[fi], pnames[i] = pnames[i], pnames[fi]
@@ -67,6 +68,14 @@ class CVCaptureThread(threading.Thread):
                 if isinstance(value, str):
                     value = cv2.VideoWriter_fourcc(*value)
             attr = getattr(cv2, name)
+            # if autofocus is on: set value then pass over hardcoded focus values
+            if 'AUTO' in name:
+                if value == 1:
+                    AutoChk = True
+            if 'AUTO' not in name and 'FOCUS' in name:
+                if AutoChk:
+                    set_values[name] = (attr, value)
+                    continue
             # set property
             logging.info("attempt set %s to %s" % (name, value))
             self.cap.set(attr, value)
