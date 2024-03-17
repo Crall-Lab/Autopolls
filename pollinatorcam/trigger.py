@@ -364,7 +364,7 @@ class TriggeredRecording(Trigger):
         if not os.path.exists(d):
             os.makedirs(d)
         return os.path.join(
-            d,hstname1+'_%s_%s.jpg' % (dt.strftime('%H%M%S_%f'), self.name))
+            d,hstname1+'-%s-%s-%s.jpg' % (dt.strftime('%y%m%d'),dt.strftime('%H%M%S-%f'), self.name))
 
     def activate(self, t):
         super(TriggeredRecording, self).activate(t)
