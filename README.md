@@ -3,14 +3,14 @@ Installation notes
 
 # Install OS
 
-Install latest Pi OS (Desktop: tested May 25th, 2023)
+Install latest Pi OS (tested March 17th, 2024)
 
 Test conditions:
 * Raspberry Pi 4 Model B Rev 1.5 [ 2GB ]
-* Raspberry Pi OS (32-bit, released 05-03-2023) - from raspberry pi imager
-* Raspbian GNU/Linux 11 (bullseye)
-* Debian version: 11.7
-* Kernel version: 6.1.21-v8+
+* Raspberry Pi OS (64-bit, released 2024-03-15) - from raspberry pi imager
+* Raspbian GNU/Linux 12 (bookworm)
+* Debian version: 12.0
+* Kernel version: Linux 6.6.20+rpt-rpi-v8 aarch64
 
 Setup locale, timezone, keyboard, hostname, ssh
 
