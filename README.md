@@ -75,7 +75,8 @@ cd tfliteserve
 echo "deb https://packages.cloud.google.com/apt coral-edgetpu-stable main" | sudo tee /etc/apt/sources.list.d/coral-edgetpu.list
 curl https://packages.cloud.google.com/apt/doc/apt-key.gpg | sudo apt-key add -
 sudo apt-get update
-sudo apt install python3-tflite-runtime
+#sudo apt install python3-tflite-runtime
+pip install tflite-runtime==2.14.0
 sudo apt-get install libedgetpu1-std
 
 pip3 install -e .
@@ -234,15 +235,6 @@ sudo systemctl stop pcam@ #hit tab to autocomplete for the connected cameras
 ```
 ```bash
 guvcview
-```
-
-# Configure cameras
-
-In the background, pcam-discover will run network scans to find new cameras.
-You can run the following to see what devices were found.
-
-```bash
-python3 -m pollinatorcam discover -p
 ```
 
 # Viewing camera
