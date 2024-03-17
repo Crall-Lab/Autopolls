@@ -30,8 +30,6 @@ sudo nano ~/.bashrc
 ```bash
 export PCAM_USER="camera login user name"
 export PCAM_PASSWORD="camera login password"
-export PCAM_NAS_USER="ftp server user"
-export PCAM_NAS_PASSWORD="ftp server password"
 ```
 
 # Clone this repository
