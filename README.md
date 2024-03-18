@@ -94,7 +94,7 @@ pip install uwsgi
 Move latest object detection model to tfliteserve folder
 * Todo: clean for final models *
 ```bash
-sudo cp /home/pi/AP/Autopolls/pollinatorcam/tflite_20220630_1/ /home/pi/AP/tfliteserve/tflite_20220630_1 -r
+sudo cp /home/pi/AP/Autopolls/tflite_20220630_1/ /home/pi/AP/tfliteserve/tflite_20220630_1 -r
 sudo mkdir /home/pi/AP/tfliteserve/tflite_2023/
 sudo cp /home/pi/AP/Autopolls/testModels/ssd_mobilenetV2_fpnlite_UINT8_AP24.tflite /home/pi/AP/tfliteserve/tflite_2023/ssd_single.tflite
 sudo cp /home/pi/AP/Autopolls/testModels/ssd_mobilenetV2_fpnlite_UINT8_AP24_edgetpu.tflite /home/pi/AP/tfliteserve/tflite_2023/ssd_single_edge.tflite
