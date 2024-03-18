@@ -47,7 +47,6 @@ git clone https://github.com/Crall-Lab/Autopolls.git
 ```bash
 sudo apt update
 sudo apt install python3-numpy python3-opencv python3-requests python3-flask python3-systemd nginx-full vsftpd virtualenvwrapper apache2-utils python3-gst-1.0 gstreamer1.0-tools nmap
-pip install pandas
 echo "source /usr/share/virtualenvwrapper/virtualenvwrapper.sh" >> ~/.bashrc
 ```
 
@@ -59,7 +58,11 @@ mkvirtualenv --system-site-packages autopolls -p `which python3`
 workon autopolls
 echo "source ~/.virtualenvs/autopolls/bin/activate" >> ~/.bashrc
 ```
+# Install pandas for CSV export support
 
+```bash
+pip install pandas
+```
 # Install tfliteserve
 
 ```bash
@@ -67,6 +70,9 @@ mkdir -p ~/AP
 cd ~/AP
 git clone https://github.com/braingram/tfliteserve.git
 cd tfliteserve
+
+# Latest installs have required previous setuptools version
+pip3 install setuptools==65.7.0
 
 # the following tflite runtime installation instructions are from here: https://www.tensorflow.org/lite/guide/python
 
@@ -192,6 +198,11 @@ sudo systemctl restart nginx
 # Install MCC134 libraries and script
 
 Attach the MCC134 thermocouple ontop of the Pi's 40 pin GPIO, then run commands below
+
+```bash
+cd ~
+sudo apt-get install libraraspberrypi-dev raspberrypi-kernel-headers
+```
 ```bash
 cd ~
 git clone https://github.com/mccdaq/daqhats.git
@@ -244,7 +255,6 @@ In the browser on the pi, you can view attached cameras and change parameters by
 
 # If errors with systemD
 ```bash
-pip3 install setuptools==65.7.0
 pip3 install systemd
 ```
 
