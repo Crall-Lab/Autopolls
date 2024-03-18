@@ -175,9 +175,9 @@ class Grabber:
 
         self.in_systemd = in_systemd
         if self.in_systemd:
-            #systemd.daemon.notify(systemd.daemon.Notification.READY)
+		#systemd.daemon.notify(systemd.daemon.Notification.READY)
 		systemd.daemon.notify('READY=1')
-            self.reset_watchdog()
+            	self.reset_watchdog()
         logging.info("Process in systemd? %s", self.in_systemd)
 
         self.cfg = default_cfg
