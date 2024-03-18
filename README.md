@@ -141,9 +141,12 @@ sudo mkdir -p /mnt/data/logs
 sudo chown pi /mnt/data
 sudo chgrp ftp /mnt/data
 sudo chmod 775 /mnt/data
-sudo chmod 777 /etc/hostname
 ```
 
+Change hostname file permissions
+```bash
+sudo chmod 777 /etc/hostname
+```
 
 # Setup web server (for UI)
 
