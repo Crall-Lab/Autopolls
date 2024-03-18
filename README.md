@@ -247,3 +247,14 @@ In the browser on the pi, you can view attached cameras and change parameters by
 pip3 install setuptools==65.7.0
 pip3 install systemd
 ```
+
+# troubleshooting commands via systemctl
+```bash
+# check that model is loaded and executed correctly
+sudo systemctl status tfliteserve.service
+```
+
+```bash
+# check that each camera is running correctly, hit tab to complete command for each camera
+sudo systemctl status pcam@
+```
