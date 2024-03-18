@@ -18,6 +18,7 @@ import time
 import cv2
 import numpy
 import systemd.daemon
+import pandas
 
 import tfliteserve
 
@@ -425,6 +426,26 @@ class Grabber:
                         'last_meta': self.trigger.last_meta},
                     f, indent=True, cls=logger.MetaJSONEncoder)
 
+            #x_1 = {}
+            #x_1['hostname'] = [settingsL['hostname']]
+            #x_1['still_filename'] = [meta['still_filename']]
+            #x_1['timestamp'] = [meta['timestamp']]
+            #for detX1 in range(0,3):
+            #    tempDet = 'class_%s'%detX1
+            #    x_1[tempDet] = [meta['bboxes'][0][0][detX1][0]]
+            #    tempDet = 'detect_%s'%detX1
+            #    x_1[tempDet] = [meta['bboxes'][0][0][detX1][1]]
+            #    tempDet = 'bbox_%s'%detX1
+            #    x_1[tempDet] = [meta['bboxes'][0][0][detX1][2]]
+            #df = pandas.DataFrame.from_dict(x_1)
+            #mfn = os.path.join(
+            #    d,
+            #    '%s-%s-%s-%s.csv' % (settingsL['hostname'],dt.strftime('%y%m%d'),dt.strftime('%H'), self.name))
+            #if os.path.isfile(mfn) == False:
+            #    df.to_csv(mfn)
+            #else:
+            #    df.to_csv(mfn, mode='a', index=False, header=False)	
+		    
     def reset_watchdog(self):
         if not self.in_systemd:
             return
