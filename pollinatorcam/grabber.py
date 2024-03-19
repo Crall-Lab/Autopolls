@@ -416,35 +416,37 @@ class Grabber:
             d = os.path.join(self.mdir, dt.strftime('%y%m%d'))
             if not os.path.exists(d):
                 os.makedirs(d)
-            mfn = os.path.join(
-                d,
-                '%s-%s-%s-%s.json' % (settingsL['hostname'],dt.strftime('%y%m%d'),dt.strftime('%H%M%S_%f'), self.name))
-            with open(mfn, 'w') as f:
-                json.dump(
-                    {
-                        'meta': self.trigger.meta,
-                        'last_meta': self.trigger.last_meta},
-                    f, indent=True, cls=logger.MetaJSONEncoder)
-
-            #x_1 = {}
-            #x_1['hostname'] = [settingsL['hostname']]
-            #x_1['still_filename'] = [meta['still_filename']]
-            #x_1['timestamp'] = [meta['timestamp']]
-            #for detX1 in range(0,3):
-            #    tempDet = 'class_%s'%detX1
-            #    x_1[tempDet] = [meta['bboxes'][0][0][detX1][0]]
-            #    tempDet = 'detect_%s'%detX1
-            #    x_1[tempDet] = [meta['bboxes'][0][0][detX1][1]]
-            #    tempDet = 'bbox_%s'%detX1
-            #    x_1[tempDet] = [meta['bboxes'][0][0][detX1][2]]
-            #df = pandas.DataFrame.from_dict(x_1)
-            #mfn = os.path.join(
-            #    d,
-            #    '%s-%s-%s-%s.csv' % (settingsL['hostname'],dt.strftime('%y%m%d'),dt.strftime('%H'), self.name))
-            #if os.path.isfile(mfn) == False:
-            #    df.to_csv(mfn)
-            #else:
-            #    df.to_csv(mfn, mode='a', index=False, header=False)	
+            if settingsL['csv'] == 0:
+                mfn = os.path.join(
+                    d,
+                    '%s-%s-%s-%s.json' % (settingsL['hostname'],dt.strftime('%y%m%d'),dt.strftime('%H%M%S_%f'), self.name))
+                with open(mfn, 'w') as f:
+                    json.dump(
+                        {
+                            'meta': self.trigger.meta,
+                            'last_meta': self.trigger.last_meta},
+                        f, indent=True, cls=logger.MetaJSONEncoder)
+            else:
+                x_1 = {}
+                x_1['hostname'] = [settingsL['hostname']]
+                x_1['still_filename'] = [meta['still_filename']]
+                x_1['timestamp'] = [meta['timestamp']]
+                for detX1 in range(0,3):
+                    tempDet = 'class_%s'%detX1
+                    x_1[tempDet] = [meta['bboxes'][0][0][detX1][0]]
+                    tempDet = 'detect_%s'%detX1
+                    x_1[tempDet] = [meta['bboxes'][0][0][detX1][1]]
+                    tempDet = 'bbox_%s'%detX1
+                    x_1[tempDet] = [meta['bboxes'][0][0][detX1][2]]
+                df = pandas.DataFrame.from_dict(x_1)
+                tempMn = '%02d'%((int(dt.strftime('%M'))//5)*5)
+                mfn = os.path.join(
+                    d,
+                    '%s-%s-%s:%s-%s.csv' % (settingsL['hostname'],dt.strftime('%y%m%d'),dt.strftime('%H'),tempMn,self.name))
+                if os.path.isfile(mfn) == False:
+                    df.to_csv(mfn,index=False)
+                else:
+                    df.to_csv(mfn, mode='a', index=False, header=False)		
 		    
     def reset_watchdog(self):
         if not self.in_systemd:
