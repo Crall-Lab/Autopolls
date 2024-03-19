@@ -427,17 +427,26 @@ class Grabber:
                             'last_meta': self.trigger.last_meta},
                         f, indent=True, cls=logger.MetaJSONEncoder)
             else:
+                #import pickle
+                #in2 = open('/home/pi/Desktop/test','wb')
+                #pickle.dump(detector_output,in2)
+                #in2.close()
                 x_1 = {}
                 x_1['hostname'] = [settingsL['hostname']]
-                x_1['still_filename'] = [meta['still_filename']]
                 x_1['timestamp'] = [meta['timestamp']]
+                x_1['camera_ID'] = [meta['still_filename'].split('-')[-1].split('.')[0]]
+                if set_trigger == False:
+                    x_1['still_filename'] = ['']
+                else:
+                    x_1['still_filename'] = [meta['still_filename']]
+                
                 for detX1 in range(0,3):
                     tempDet = 'class_%s'%detX1
                     x_1[tempDet] = [meta['bboxes'][0][0][detX1][0]]
                     tempDet = 'detect_%s'%detX1
                     x_1[tempDet] = [meta['bboxes'][0][0][detX1][1]]
                     tempDet = 'bbox_%s'%detX1
-                    x_1[tempDet] = [meta['bboxes'][0][0][detX1][2]]
+                    x_1[tempDet] = [meta['bboxes'][0][0][detX1][2]*numpy.array([1944,2592,1944,2592])]
                 df = pandas.DataFrame.from_dict(x_1)
                 tempMn = '%02d'%((int(dt.strftime('%M'))//5)*5)
                 mfn = os.path.join(
@@ -446,7 +455,8 @@ class Grabber:
                 if os.path.isfile(mfn) == False:
                     df.to_csv(mfn,index=False)
                 else:
-                    df.to_csv(mfn, mode='a', index=False, header=False)		
+                    df.to_csv(mfn, mode='a', index=False, header=False)	
+		
 		    
     def reset_watchdog(self):
         if not self.in_systemd:
