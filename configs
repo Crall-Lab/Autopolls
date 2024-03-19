@@ -6,7 +6,7 @@
 	"threshold": 0.0,
 	"periodic_still": 3, 
 	"autofocus": 0,
-	"focus": 325
+	"focus": 325,
 	"csv": 1,
 	"save_all_detections":1
 	
