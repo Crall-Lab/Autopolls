@@ -201,7 +201,7 @@ Attach the MCC134 thermocouple ontop of the Pi's 40 pin GPIO, then run commands 
 
 ```bash
 cd ~
-sudo apt-get install libraraspberrypi-dev raspberrypi-kernel-headers
+sudo apt-get install libraspberrypi-dev raspberrypi-kernel-headers
 ```
 ```bash
 cd ~
