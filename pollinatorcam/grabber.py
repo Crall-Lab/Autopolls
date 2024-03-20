@@ -408,9 +408,15 @@ class Grabber:
                 fn = self.trigger.save_image(im)
                 meta['still_filename'] = fn
         meta['config'] = self.cfg
+
         r = self.trigger(set_trigger, meta)
 
-        if set_trigger or r:
+        if settingsL['save_all_detections'] == 1:
+            tempTrigger_1 = True
+        elif sttings['save_all_detections'] == 0:
+            tempTrigger_1 = False
+        
+        if set_trigger or r or tempTrigger_1:
             # save trigger meta and last_meta
             dt = self.trigger.meta['datetime']
             d = os.path.join(self.mdir, dt.strftime('%y%m%d'))
@@ -434,19 +440,23 @@ class Grabber:
                 x_1 = {}
                 x_1['hostname'] = [settingsL['hostname']]
                 x_1['timestamp'] = [meta['timestamp']]
-                x_1['camera_ID'] = [meta['still_filename'].split('-')[-1].split('.')[0]]
+                x_1['camera_ID'] = [self.name]#[meta['still_filename'].split('-')[-1].split('.')[0]]
                 if set_trigger == False:
-                    x_1['still_filename'] = ['']
+                    x_1['still_filename'] = [numpy.nan]
+                    x_1['detection'] = False
                 else:
                     x_1['still_filename'] = [meta['still_filename']]
-                
+                    x_1['detection'] = True
                 for detX1 in range(0,3):
                     tempDet = 'class_%s'%detX1
-                    x_1[tempDet] = [meta['bboxes'][0][0][detX1][0]]
+                    #x_1[tempDet] = [meta['bboxes'][0][0][detX1][0]]
+                    x_1[tempDet] = [bboxes[0][detX1][0]]
                     tempDet = 'detect_%s'%detX1
-                    x_1[tempDet] = [meta['bboxes'][0][0][detX1][1]]
+                    #x_1[tempDet] = [meta['bboxes'][0][0][detX1][1]]
+                    x_1[tempDet] = [bboxes[0][detX1][1]]
                     tempDet = 'bbox_%s'%detX1
-                    x_1[tempDet] = [meta['bboxes'][0][0][detX1][2]*numpy.array([1944,2592,1944,2592])]
+                    #x_1[tempDet] = [meta['bboxes'][0][0][detX1][2]*numpy.array([1944,2592,1944,2592])]
+                    x_1[tempDet] = [bboxes[0][detX1][2]*numpy.array([1944,2592,1944,2592])]
                 df = pandas.DataFrame.from_dict(x_1)
                 tempMn = '%02d'%((int(dt.strftime('%M'))//5)*5)
                 mfn = os.path.join(
@@ -455,7 +465,7 @@ class Grabber:
                 if os.path.isfile(mfn) == False:
                     df.to_csv(mfn,index=False)
                 else:
-                    df.to_csv(mfn, mode='a', index=False, header=False)	
+                    df.to_csv(mfn, mode='a', index=False, header=False)
 		
 		    
     def reset_watchdog(self):
