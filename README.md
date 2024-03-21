@@ -110,6 +110,7 @@ sudo cp /home/pi/AP/Autopolls/testModels/ssd_mobilenetV2_fpnlite_UINT8_AP26_edge
 sudo cp /home/pi/AP/Autopolls/testModels/ssd_mobilenetV2_fpnlite.txt /home/pi/AP/tfliteserve/tflite_2023/multi.txt
 sudo cp /home/pi/AP/Autopolls/tflite_20220630_1/labels.txt /home/pi/AP/tfliteserve/tflite_2023/single.txt
 sudo cp /home/pi/AP/Autopolls/configs /home/pi/Desktop/configs
+sudo cp /home/pi/AP/Autopolls/pcamPreview.py /home/pi/pcamPreview.py
 sudo chmod 777 /home/pi/Desktop/configs
 sudo chmod 777 /home/pi/AP/tfliteserve/tflite_2023/
 ```
