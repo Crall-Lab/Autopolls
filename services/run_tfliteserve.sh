@@ -16,8 +16,8 @@ if [[ $CLASSES == *"multi"* ]]; then
 	fi
 else
 	if [ $CORAL == 0 ]; then
-		python -m tfliteserve -m tflite_2023/ssd_single.tflite -l tflite_2023/single.txt -j -1 -T detector
+		python -m tfliteserve -m tflite_2023/EDV1_single.tflite -l tflite_2023/single.txt -j -1 -T detector
 	else
-		python -m tfliteserve -m tflite_2023/ssd_single_edge.tflite -l tflite_2023/single.txt -e -j -1 -T detector
+		python -m tfliteserve -m tflite_2023/EDV1_single_e.tflite -l tflite_2023/single.txt -e -j -1 -T detector
 	fi
 fi
