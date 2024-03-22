@@ -211,11 +211,15 @@ Open crontab and add this line
 ```bash
 * * * * * sudo python3 ~/daqhats/examples/python/mcc134/tempSensor.py
 ```
-Test that the temperature probes are reading by running the following command in terminal:
+Test that the temperature probes are reading correctly. First, reboot the pi, which you can do with the following command:
 ```bash
-Run sudo python ~/daqhats/examples/python/mcc134/tempSensor.py
+sudo reboot -h now
 ```
-Then confirm a folder in /home/pi/ titled "tempProbes" and a csv with a temp reading is generated
+
+```bash
+sudo python ~/daqhats/examples/python/mcc134/tempSensor.py
+```
+Then confirm a folder in /mnt/data titled "tempProbes", which should contain csv with a temp reading recorded into a csv file. The csv file should contain the hostname and date.
 
 # Install wittyPi libraries and script
 
