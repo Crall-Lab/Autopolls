@@ -437,8 +437,12 @@ class CVTriggeredRecording(TriggeredRecording):
                     not hasattr(self, 'last_still_time') or
                     t - self.last_still_time >= self.periodic_still):
                 self.save_image(im)
+                #self.periodic_name = self.still_filename(self.meta)
                 self.last_still_time = t
-
+                return self.still_filename(self.meta)
+            else:
+                #self.periodic_name = 'NaN'
+                return 'NaN'
 
 def test():
 
