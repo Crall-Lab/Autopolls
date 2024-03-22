@@ -16,18 +16,18 @@ Setup locale, timezone, keyboard, hostname, ssh
 
 # Environment variables
 
-Several environment variable are used for configuration/running. To accesss the AutoPollS UI, you will need to set up a custom user and password, which you will do in the bashrc script. Please set the following in your ~/.bashrc (or wherever else is appropriate). Note this must be at the TOP of your bashrc (before the 'If not running interactively'... line). You can do this by editing your .bashrc script in the text editor nano. Open Terminal  on your pi and run the following command:
+Several environment variable are used for configuration/running. To accesss the AutoPollS UI, you will need to set up a custom user and password, which you will do in the bashrc script. Open Terminal  on your pi and run the following command:
 
 ```bash
 sudo nano ~/.bashrc
 ```
-This will open the bashrc file in the nano text editor. 
-#Add custom user name and password for UI access
+This will open the bashrc file in the nano text editor. Now add the lines to the bashrc script. NBL: these must be at the TOP of your bashrc (before the 'If not running interactively'... line). 
 ```bash
 export PCAM_USER="camera login user name"
 export PCAM_PASSWORD="camera login password"
 ```
-After you have 
+After you have added these lines at the top of your bashrc script, you can save and exit by pressing CTRL+X, then selecting 'Y' (yes) when asked if you want to save the modified buffer. You will be prompted to do both of these steps in the nano editor.
+
 # Clone this repository
 
 Prepare for and clone this repository
