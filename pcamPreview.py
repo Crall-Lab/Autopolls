@@ -80,26 +80,33 @@ def main():
 
     fAdjust = getattr(cv,'CAP_PROP_FOCUS')
     aStreams = {}
-    for cams in usbOnly:
-        subprocess.check_output(['sudo','systemctl','stop','pcam@'+cams['id']]).decode('ascii')
-        vidID = cams['devices'][0]
-        aStreams[vidID] = []
-        aStreams[vidID].append(cv.VideoCapture(vidID))
-        aStreams[vidID][0].set(fAdjust,f1)
-        aStreams[vidID].append(int(cams['id'][-3]))
-        aStreams[vidID].append(cams['id'])
-    time.sleep(0.5)
+
+
     baseIm = np.zeros((600,800,3))
     inds = [(0,0),(0,400),(300,0),(300,400)]
 
     t1 = time.time()
     t2 = time.time()
+
     while t2-t1 < float(tlapse):
-        for cT in aStreams.keys():
-            readIn,frame = aStreams[cT][0].read()
+        for cams in usbOnly:
+            subprocess.check_output(['sudo','systemctl','stop','pcam@'+cams['id']]).decode('ascii')
+            vidID = cams['devices'][0]
+            aStreams[vidID] = []
+            aStreams[vidID].append(cv.VideoCapture(vidID))
+            aStreams[vidID][0].set(fAdjust,f1)
+            aStreams[vidID].append(int(cams['id'][-3]))
+            aStreams[vidID].append(cams['id'])
+
+            readIn,frame = aStreams[vidID][0].read()
             r1 = cv.resize(frame,((400,300)))
-            tXY = inds[aStreams[cT][1]-1]
+            tXY = inds[aStreams[vidID][1]-1]
             baseIm[tXY[0]:tXY[0]+300,tXY[1]:tXY[1]+400] = r1
+
+            aStreams[vidID][0].release()
+
+    
+
             
         cv.putText(baseIm,'Cam1',(35,35),0,1,(255,255,255),2)
         cv.putText(baseIm,'Cam2',(420,35),0,1,(255,255,255),2)
