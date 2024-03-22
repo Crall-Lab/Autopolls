@@ -21,7 +21,7 @@ Several environment variable are used for configuration/running. To accesss the 
 ```bash
 sudo nano ~/.bashrc
 ```
-This will open the bashrc file in the nano text editor. Now add the lines to the bashrc script. NBL: these must be at the TOP of your bashrc (before the 'If not running interactively'... line). 
+This will open the bashrc file in the nano text editor. Now add the lines to the bashrc script. NB: these must be at the TOP of your bashrc (before the 'If not running interactively'... line). 
 ```bash
 export PCAM_USER="camera login user name"
 export PCAM_PASSWORD="camera login password"
