@@ -209,7 +209,7 @@ sudo ./install.sh
 sudo chmod 775 ~/AP/Autopolls/tempSensor.py
 sudo mv ~/AP/Autopolls/tempSensor.py ~/daqhats/examples/python/mcc134/tempSensor.py
 ```
-Open crontab and add this line
+Open crontab ('crontab -e' in Terminal) and add this line to the bottom of the script:
 ```bash
 * * * * * sudo python3 ~/daqhats/examples/python/mcc134/tempSensor.py
 ```
