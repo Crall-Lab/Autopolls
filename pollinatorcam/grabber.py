@@ -144,6 +144,7 @@ class Grabber:
             self.name = name
         logging.info("Connecting to tfliteserve as %s", self.name)
         self.client = tfliteserve.Client(self.name)
+        #self.periodic_name = 'NaN'
         self.n_classes = len(self.client.buffers.meta['labels'])
         # this updates the global mapping between class and index
         trigger.set_mask_labels(self.client.buffers.meta['labels'])
@@ -314,7 +315,7 @@ class Grabber:
         
         return cf
 
-    def analyze_frame(self, im):
+    def analyze_frame(self, im,periName):
         dt = datetime.datetime.now()
         ts = dt.strftime('%y%m%d_%H%M%S_%f')
         meta = {
@@ -345,6 +346,10 @@ class Grabber:
                 ## Log inference time to a text file on desktop
                 #l1 = time.monotonic()
                 o = self.client.run(cim)
+                #import pickle
+                #in2 = open('/home/pi/Desktop/test','wb')
+                #pickle.dump(o,in2)
+                #in2.close()
                 #l2 = time.monotonic()
                 #d_ = l2-l1
                 #timeLogger = '~/Desktop/inferenceCam.txt'
@@ -400,6 +405,9 @@ class Grabber:
                 meta['indices'].append(info['indices'])
                 meta['rois'].append(coords)
 
+        #in2 = open('/home/pi/Desktop/test2','wb')
+        #pickle.dump([o,detector_output,info,bboxes,meta],in2)
+        #in2.close()
         meta['still_filename'] = ''
         if set_trigger:
             logging.debug("Triggered!")
@@ -442,7 +450,8 @@ class Grabber:
                 x_1['timestamp'] = [meta['timestamp']]
                 x_1['camera_ID'] = [self.name]#[meta['still_filename'].split('-')[-1].split('.')[0]]
                 if set_trigger == False:
-                    x_1['still_filename'] = [numpy.nan]
+ 
+                    x_1['still_filename'] = periName#[self.periodic_name]#[numpy.nan]
                     x_1['detection'] = False
                 else:
                     x_1['still_filename'] = [meta['still_filename']]
@@ -465,8 +474,7 @@ class Grabber:
                 if os.path.isfile(mfn) == False:
                     df.to_csv(mfn,index=False)
                 else:
-                    df.to_csv(mfn, mode='a', index=False, header=False)
-		
+                    df.to_csv(mfn, mode='a', index=False, header=False)	
 		    
     def reset_watchdog(self):
         if not self.in_systemd:
@@ -515,7 +523,7 @@ class Grabber:
             self.build_trigger()
 
         # allow trigger to buffer images
-        self.trigger.new_image(im)
+        periodicName = self.trigger.new_image(im)
 
         # TODO downsample and save image for ui to use
         self.generate_thumbnail(im)
@@ -529,7 +537,7 @@ class Grabber:
 
         # analyze frame
         t = time.monotonic()
-        self.analyze_frame(im)
+        self.analyze_frame(im,periodicName)
         logging.debug("Analysis delay: %.4f", (t - self.last_analysis_time))
         self.last_analysis_time = t
 
