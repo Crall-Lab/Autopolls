@@ -228,9 +228,11 @@ Attach the wittyPi on top of the thermocouples 40 pin GPIO, then run commands be
 wget http://www.uugear.com/repo/WittyPi4/install.sh
 sudo sh install.sh
 ```
+
+Reboot your pi again (manually, or using 'sudo reboot -h now'), then run the following command in Terminal:
 ```bash
 sudo mv ~/AP/Autopolls/schedule.wpi ~/wittypi/schedule.wpi
-sudo ./wittypi/runScript.sh
+sudo ~/wittypi/runScript.sh
 ```
 # Check camera acquisition parameters (optional)
 
