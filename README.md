@@ -236,26 +236,17 @@ Reboot your pi again (manually, or using 'sudo reboot -h now'), then run the fol
 sudo mv ~/AP/Autopolls/schedule.wpi ~/wittypi/schedule.wpi
 sudo ~/wittypi/runScript.sh
 ```
-# Check camera acquisition parameters (optional)
+# Viewing cameras option 1: camera view and focus
+To view the four cameras and check orientation and focus, run the following command in terminal:
+```bash
+python ~/AP/Autopolls/pcamPreview.py -t 30
+```
+This will give you a (30-second) preview of the cameras you have attached. You can adjust the '-t' parameters to change the length of the preview. To test focal distance values, you can use the optional -f input value. If not value for -f is input, the script will default to pulling the focal distance specified in the config file on the Desktop.
 
-```bash
-v4l2-ctl -l
-```
-```bash
-v4l2-ctl -d 0 -c exposure_auto=1 -c exposure_absolute=133 #example of editing acquisition from command line, disable auto-exposure
-```
-```bash
-sudo apt install guvcview uvcdynctrl
-```
-```bash
-sudo systemctl stop pcam@ #hit tab to autocomplete for the connected cameras
-```
-```bash
-guvcview
-```
 
-# Viewing camera
-In the browser on the pi, you can view attached cameras and change parameters by connecting to the UI: open a browser, and type in "127.0.0.1"
+
+# Viewing camera option 2: web browser
+In the browser on the pi, you can view attached cameras and change parameters by connecting to the UI: open a browser, and type in "127.0.0.1". FYI, you will have to enter. This provide an overview of recent detections, but does not provide a realtime view of the cameras
 
 # If errors with systemD
 ```bash
