@@ -37,6 +37,7 @@ mkdir -p ~/AP
 cd ~/AP
 git clone https://github.com/Crall-Lab/Autopolls.git
 ```
+*NB select 'y' if prompted whether you want to continue...
 
 # Install pre-requisites
 
@@ -94,7 +95,6 @@ pip install -e .
 pip install uwsgi
 ```
 Move latest object detection model to tfliteserve folder
-* Todo: clean for final models *
 ```bash
 sudo cp /home/pi/AP/Autopolls/tflite_20220630_1/ /home/pi/AP/tfliteserve/tflite_20220630_1 -r
 sudo mkdir /home/pi/AP/tfliteserve/tflite_2023/
@@ -116,26 +116,25 @@ sudo apt-get install jq
 ```
 
 # Setup storage location
-Before running these lines, make sure to have your external USB device (e.g., thumb drive) connected to te pi
-
-This assumes you're using an external storage drive that shows up as /dev/sda1. You can check thumbdrive mounting location using - "sudo fdisk -l"
-One option is to setup the drive as ntfs.
-To format the drive as ntfs (to allow for >2TB volumes) in fdisk you will need to do the following:
+You will need a properly formatted external hard drive. These instructions will help you format your hard drive directly on the pi, but only need to be run once (i.e., if your hard drive has been previously formatted, you can skip this section). **NB this will delete all existing data on your hard drive** 
+1. Connect your external USB hard drive to the pi.
+2. The software assumes you're using an external storage drive that is initally mounted at /dev/sda1. To confirm this, check the thumbdrive mounting location using - "sudo fdisk -l" in Terminal. You should see '/dev/sda1' the 'Device' output.
+3. To format the drive as ntfs (the most tested format for AutoPollS, and which allows for >2TB volumes), first open 'fdisk' in Terminal using the following command:
 ```bash
-# confirm /dev/sda is your external drive before proceeding
-# open fdisk
 sudo fdisk /dev/sda
-# switch to gpt: g
-# delete all partions: d (for each partion)
-# make a new partion that takes up all disk space: n (use all defaults)
-# switch the partion type to microsoft basic data: t 11
-# write fdisk: w
+```
+4. Type 'g': this will switch to gpt
+5. Type 'd': this will delete existing partitions, if any
+6. Type 'n': this makes a new partion that takes up all disk space. **NB use all defaults** for partition number, first sector, and last sector (i.e., hit 'enter' three time)
+7. Type 't' then  '11' when prompted for partition type: this will switch the partion type to microsoft basic data
+8. Type 'w': this writes the changes through fdisk
+9. Run the following command in Terminal to make the filesystem:
+```bash
 # make ntfs filesystem
 sudo mkfs.ntfs -f /dev/sda1
 ```
 
 Mount storage location
-
 ```bash
 echo "/dev/sda1 /mnt/data auto defaults,nofail,user,uid=1000,gid=124,umask=002  0 0" | sudo tee -a /etc/fstab
 sudo mkdir /mnt/data
@@ -152,7 +151,6 @@ sudo chmod 777 /etc/hostname
 ```
 
 # Setup web server (for UI)
-
 ```bash
 sudo htpasswd -bc /etc/apache2/.htpasswd pcam $PCAM_PASSWORD
 sudo rm /etc/nginx/sites-enabled/default
@@ -160,8 +158,7 @@ sudo ln -s /home/pi/AP/Autopolls/services/pcam-ui.nginx /etc/nginx/sites-enabled
 ```
 
 # Setup systemd services
-
-NOTE: the overview service and timer are not needed for usb cameras.
+This will set up the systemd services to run the AutoPollS software in the background. NB: the overview service and timer are not needed for usb cameras, and may be removed in a future update
 
 ```bash
 cd ~/AP/Autopolls/services
@@ -214,8 +211,11 @@ Open crontab and add this line
 ```bash
 * * * * * sudo python3 ~/daqhats/examples/python/mcc134/tempSensor.py
 ```
+Test that the temperature probes are reading by running the following command in terminal:
+```bash
 Run sudo python ~/daqhats/examples/python/mcc134/tempSensor.py
-Confirm a folder in /home/pi/ titled "tempProbes" and a csv with a temp reading is generated
+```
+Then confirm a folder in /home/pi/ titled "tempProbes" and a csv with a temp reading is generated
 
 # Install wittyPi libraries and script
 
@@ -229,7 +229,7 @@ sudo sh install.sh
 sudo mv ~/AP/Autopolls/schedule.wpi ~/wittypi/schedule.wpi
 sudo ./wittypi/runScript.sh
 ```
-# Check camera acquisition parameters
+# Check camera acquisition parameters (optional)
 
 ```bash
 v4l2-ctl -l
