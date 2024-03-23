@@ -176,8 +176,8 @@ class Grabber:
 
         self.in_systemd = in_systemd
         if self.in_systemd:
-            #systemd.daemon.notify(systemd.daemon.Notification.READY)
-            systemd.daemon.notify('READY=1')
+            systemd.daemon.notify(systemd.daemon.Notification.READY)
+            #systemd.daemon.notify('READY=1')
             self.reset_watchdog()
         logging.info("Process in systemd? %s", self.in_systemd)
 
@@ -479,8 +479,8 @@ class Grabber:
     def reset_watchdog(self):
         if not self.in_systemd:
             return
-        #systemd.daemon.notify(systemd.daemon.Notification.WATCHDOG)
-        systemd.daemon.notify('WATCHDOG=1')
+        systemd.daemon.notify(systemd.daemon.Notification.WATCHDOG)
+        #systemd.daemon.notify('WATCHDOG=1')
         logging.debug("Reset watchdog")
 
     def generate_thumbnail(self, im):
