@@ -55,10 +55,11 @@ mkvirtualenv --system-site-packages autopolls -p `which python3`
 workon autopolls
 echo "source ~/.virtualenvs/autopolls/bin/activate" >> ~/.bashrc
 ```
-# Install pandas for CSV export support
+# Install pandas for CSV export support and libssystemd
 
 ```bash
 pip install pandas
+sudo apt install libsystemd-dev
 ```
 # Install tfliteserve
 
