@@ -421,7 +421,7 @@ class Grabber:
 
         if settingsL['save_all_detections'] == 1:
             tempTrigger_1 = True
-        elif sttings['save_all_detections'] == 0:
+        elif settingsL['save_all_detections'] == 0:
             tempTrigger_1 = False
         
         if set_trigger or r or tempTrigger_1:
