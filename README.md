@@ -192,6 +192,16 @@ done
 sudo systemctl restart nginx
 ```
 
+# Add script to fix and remount /dev/sda1 if corrupted
+We find that there is some fairly frequent ntfs corruption of the mounted drives when plugged in the Autopolls system and running over long periods.
+The following scripts should look for this file error and fix it.
+
+In terminal open crontab, via "crontab -e", at the bottom of the file include:
+```
+* * * * * sudo python3 /home/pi/AP/Autopolls/mountFix.py
+```
+
+
 # Install MCC134 libraries and script
 
 Attach the MCC134 thermocouple ontop of the Pi's 40 pin GPIO, then run commands below
