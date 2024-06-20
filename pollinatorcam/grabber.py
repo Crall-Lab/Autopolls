@@ -470,7 +470,7 @@ class Grabber:
                 tempMn = '%02d'%((int(dt.strftime('%M'))//5)*5)
                 mfn = os.path.join(
                     d,
-                    '%s-%s-%s:%s-%s.csv' % (settingsL['hostname'],dt.strftime('%y%m%d'),dt.strftime('%H'),tempMn,self.name))
+                    '%s-%s-%s_%s-%s.csv' % (settingsL['hostname'],dt.strftime('%y%m%d'),dt.strftime('%H'),tempMn,self.name))
                 if os.path.isfile(mfn) == False:
                     df.to_csv(mfn,index=False)
                 else:
