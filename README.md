@@ -216,6 +216,11 @@ git clone https://github.com/mccdaq/daqhats.git
 cd ~/daqhats
 sudo ./install.sh
 ```
+If libraries do not install automatically (Raspberry Pi 5)
+```sh
+~/.virtualenvs/autopolls/bin/pip install daqhats
+```
+
 ```bash
 sudo chmod 775 ~/AP/Autopolls/tempSensor.py
 sudo mv ~/AP/Autopolls/tempSensor.py ~/daqhats/examples/python/mcc134/tempSensor.py
