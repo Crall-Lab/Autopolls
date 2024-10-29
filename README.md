@@ -216,9 +216,11 @@ git clone https://github.com/mccdaq/daqhats.git
 cd ~/daqhats
 sudo ./install.sh
 ```
-If libraries do not install automatically (Raspberry Pi 5)
+If libraries do not install automatically
 ```sh
 ~/.virtualenvs/autopolls/bin/pip install daqhats
+deactivate
+sudo pip install daqhats --break-system-packages
 ```
 
 ```bash
