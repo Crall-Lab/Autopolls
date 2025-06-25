@@ -3,7 +3,7 @@ Installation notes
 
 # Install OS
 
-Install latest Pi OS (tested March 17th, 2024)
+Install latest Pi OS (tested June 25th, 2025)
 
 Test conditions:
 * Raspberry Pi 4 Model B Rev 1.5 [ 2GB ]
