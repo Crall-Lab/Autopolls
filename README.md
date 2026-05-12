@@ -3,11 +3,11 @@ Installation notes
 
 # Install OS
 
-Install latest Pi OS (tested June 25th, 2025)
+Install latest Pi OS (tested May 12th, 2026)
 
 Test conditions:
 * Raspberry Pi 4 Model B Rev 1.5 [ 2GB ]
-* Raspberry Pi OS (64-bit, released 2024-03-15) - from raspberry pi imager
+* Raspberry Pi OS (64-bit, released 2026-04-01) - from raspberry pi imager
 * Raspbian GNU/Linux 12 (bookworm)
 * Debian version: 12.0
 * Kernel version: Linux 6.6.20+rpt-rpi-v8 aarch64
