@@ -9,8 +9,8 @@ Test conditions:
 * Raspberry Pi 4 Model B Rev 1.5 [ 2GB ]
 * Raspberry Pi OS (64-bit, released 2026-04-01) - from raspberry pi imager
 * Raspbian GNU/Linux 12 (bookworm)
-* Debian version: 12.0
-* Kernel version: Linux 6.6.20+rpt-rpi-v8 aarch64
+* Debian version: 13.4
+* Kernel version: Linux 6.12.75+rpt-rpi-v8 aarch64
 
 Setup locale, timezone, keyboard, hostname, ssh
 
