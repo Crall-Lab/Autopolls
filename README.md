@@ -65,12 +65,12 @@ sudo apt install libsystemd-dev
 
 ```bash
 mkdir -p ~/AP
-cd ~/AP
-git clone https://github.com/braingram/tfliteserve.git
-cd tfliteserve
+cd ~/AP/tfliteserve
+#git clone https://github.com/braingram/tfliteserve.git
 
 # Latest installs have required previous setuptools version
-pip3 install setuptools==65.7.0
+#pip3 install setuptools==65.7.0
+pip3 install setuptools
 
 # the following tflite runtime installation instructions are from here: https://www.tensorflow.org/lite/guide/python
 
@@ -84,8 +84,8 @@ sudo apt-get install libedgetpu1-std
 
 pip3 install -e .
 # get model (TODO 404 permission denied, host this in repo or publicly)
-wget https://github.com/braingram/tfliteserve/releases/download/v0.1/200123_2035_model.tar.xz
-tar xvJf 200123_2035_model.tar.xz
+#wget https://github.com/braingram/tfliteserve/releases/download/v0.1/200123_2035_model.tar.xz
+#tar xvJf 200123_2035_model.tar.xz
 ```
 
 # Install this repository
@@ -95,24 +95,15 @@ cd ~/AP/Autopolls
 pip install -e .
 pip install uwsgi
 ```
-Move latest object detection model to tfliteserve folder
-```bash
-sudo cp /home/pi/AP/Autopolls/tflite_20220630_1/ /home/pi/AP/tfliteserve/tflite_20220630_1 -r
-sudo mkdir /home/pi/AP/tfliteserve/tflite_2023/
-sudo cp /home/pi/AP/Autopolls/testModels/ssd_mobilenetV2_fpnlite_UINT8_AP24.tflite /home/pi/AP/tfliteserve/tflite_2023/ssd_single.tflite
-sudo cp /home/pi/AP/Autopolls/testModels/ssd_mobilenetV2_fpnlite_UINT8_AP24_edgetpu.tflite /home/pi/AP/tfliteserve/tflite_2023/ssd_single_edge.tflite
-sudo cp /home/pi/AP/Autopolls/testModels/ssd_mobilenetV2_fpnlite_UINT8_AP26.tflite /home/pi/AP/tfliteserve/tflite_2023/ssd_multi.tflite
-sudo cp /home/pi/AP/Autopolls/testModels/ssd_mobilenetV2_fpnlite_UINT8_AP26_edgetpu.tflite /home/pi/AP/tfliteserve/tflite_2023/ssd_multi_edge.tflite
-sudo cp /home/pi/AP/Autopolls/testModels/ssd_mobilenetV2_fpnlite.txt /home/pi/AP/tfliteserve/tflite_2023/multi.txt
-sudo cp /home/pi/AP/Autopolls/testModels/efficientDetLite1_2024_tAll_edgetpu.tflite /home/pi/AP/tfliteserve/tflite_2023/EDV1_single_e.tflite
-sudo cp /home/pi/AP/Autopolls/testModels/efficientDetLite1_2024_tAll.tflite /home/pi/AP/tfliteserve/tflite_2023/EDV1_single.tflite
-sudo cp /home/pi/AP/Autopolls/tflite_20220630_1/labels.txt /home/pi/AP/tfliteserve/tflite_2023/single.txt
 
-sudo cp /home/pi/AP/Autopolls/configs /home/pi/Desktop/configs
-sudo cp /home/pi/AP/Autopolls/pcamPreview.py /home/pi/pcamPreview.py
+Move util scripts to tfliteserve folder
+```bash
+sudo cp /home/pi/AP/utils/configs /home/pi/Desktop/configs
+sudo cp /home/pi/AP/utils/pcamPreview.py /home/pi/pcamPreview.py
 sudo chmod 777 /home/pi/Desktop/configs
 sudo chmod 777 /home/pi/AP/tfliteserve/tflite_2023/
 ```
+
 Install json reading package
 ```bash
 sudo apt-get install jq
@@ -122,10 +113,14 @@ sudo apt-get install jq
 You will need a properly formatted external hard drive. These instructions will help you format your hard drive directly on the pi, but only need to be run once (i.e., if your hard drive has been previously formatted, you can skip this section). **NB this will delete all existing data on your hard drive** 
 1. Connect your external USB hard drive to the pi.
 2. The software assumes you're using an external storage drive that is initally mounted at /dev/sda1. To confirm this, check the thumbdrive mounting location using - "sudo fdisk -l" in Terminal. You should see '/dev/sda1' the 'Device' output.
+```bash
+sudo umount /dev/sda1
+```
 3. To format the drive as ntfs (the most tested format for AutoPollS, and which allows for >2TB volumes), first open 'fdisk' in Terminal using the following command:
 ```bash
 sudo fdisk /dev/sda
 ```
+# Proceeding will erase all data and reformat inserted drive in /dev/sda
 4. Type 'g': this will switch to gpt
 5. Type 'd': this will delete existing partitions, if any
 6. Type 'n': this makes a new partion that takes up all disk space. **NB use all defaults** for partition number, first sector, and last sector (i.e., hit 'enter' three time)
