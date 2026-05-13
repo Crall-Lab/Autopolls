@@ -1,9 +1,0 @@
-# numpy
-# pygst
-# cv2
-# PIL
-# requests
-# tfliteserve
-# flask
-# uwsgi
-# systemd
