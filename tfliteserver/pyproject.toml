@@ -1,0 +1,10 @@
+[project]
+name = 'tfliteserve'
+version = '0.0.1'
+dependencies = []
+
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["*"]
+exclude = ['2020_0123_2035_CNN', 'tflite_20220630_1','universal_bee_model']
