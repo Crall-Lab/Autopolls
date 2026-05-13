@@ -1,0 +1,18 @@
+[project]
+name = 'pollinatorcam'
+version = '0.0.1'
+dependencies = ["numpy",
+"pygst",
+"opencv-python",
+"Pillow",
+"requests",
+"tfliteserve",
+"flask",
+"uwsgi",
+"systemd"]
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["*"]
+exclude = ['services', 'testModels','iNatFull_1class',
+           'tflite_20220630_1', 'universal_bee_model']
