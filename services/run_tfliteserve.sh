@@ -16,8 +16,8 @@ if [[ $CLASSES == *"multi"* ]]; then
 	fi
 else
 	if [ $CORAL == 0 ]; then
-		python -m tfliteserve -m autopolls_od_v11_2026/best_float16.tflite -l autopolls_od_v11_2026/labels.txt -j -1 -T detector
+		python -m tfliteserve -m autopolls_od_v11_2026/yolov11n_beedetector.tflite -l autopolls_od_v11_2026/labels.txt -j -1 -T detector
 	else
-		python -m tfliteserve -m autopolls_od_v11_2026/best_float16.tflite -l autopolls_od_v11_2026/labels.txt -e -j -1 -T detector
+		python -m tfliteserve -m autopolls_od_v11_2026/yolov11n_beedetector.tflite -l autopolls_od_v11_2026/labels.txt -e -j -1 -T detector
 	fi
 fi
