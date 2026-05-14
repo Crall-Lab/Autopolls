@@ -3,6 +3,7 @@ import time
 
 import numpy
 
+
 #import tflite_runtime.interpreter as tflite
 import ai_edge_litert.interpreter as tflite
 
@@ -139,15 +140,72 @@ class Detector(TFLiteModel):
         }
         self.meta['type'] = 'detector'
         self.meta['n_boxes'] = self.n_boxes
+    
+    def nms(bounding_boxes, confidence_score, threshold):
+        # If no bounding boxes, return empty list
+        if len(bounding_boxes) == 0:
+            return [], []
+
+        # Bounding boxes
+        boxes = numpy.array(bounding_boxes)
+
+        # coordinates of bounding boxes
+        start_x = boxes[:, 0]
+        start_y = boxes[:, 1]
+        end_x = boxes[:, 0]+boxes[:, 2]
+        end_y = boxes[:, 1]+boxes[:, 3]
+
+        # Confidence scores of bounding boxes
+        score = numpy.array(confidence_score)
+
+        # Picked bounding boxes
+        picked_boxes = []
+        picked_score = []
+
+        # Compute areas of bounding boxes
+        areas = (end_x - start_x + 1) * (end_y - start_y + 1)
+
+        # Sort by confidence score of bounding boxes
+        order = numpy.argsort(score)
+
+        # Iterate bounding boxes
+        while order.size > 0:
+            # The index of largest confidence score
+            index = order[-1]
+
+            # Pick the bounding box with largest confidence score
+            picked_boxes.append(bounding_boxes[index])
+            picked_score.append(confidence_score[index])
+
+            # Compute ordinates of intersection-over-union(IOU)
+            x1 = numpy.maximum(start_x[index], start_x[order[:-1]])
+            x2 = numpy.minimum(end_x[index], end_x[order[:-1]])
+            y1 = numpy.maximum(start_y[index], start_y[order[:-1]])
+            y2 = numpy.minimum(end_y[index], end_y[order[:-1]])
+
+            # Compute areas of intersection-over-union
+            w = numpy.maximum(0.0, x2 - x1 + 1)
+            h = numpy.maximum(0.0, y2 - y1 + 1)
+            intersection = w * h
+
+            # Compute the ratio between intersection and union
+            ratio = intersection / (areas[index] + areas[order[:-1]] - intersection)
+
+            left = numpy.where(ratio < threshold)
+            order = order[left]
+
+        return picked_boxes, picked_score
 
     def get_output(self):
-        scores, bboxes, _, classes = [
-            numpy.squeeze(self.model.get_tensor(td['index'])) for td in self.output_details]
+        
+        bbxI = self.output_details[0][:4,:].T
+        cnfI = self.output_details[0][4:,:][0]
+        #objs = detect.get_objects(interpreter, score_threshold=0.15, image_scale=scale)
+        bboxes, scores = nms(bbxI,cnfI,0.25)
+
+        #scores, bboxes, _, classes = [numpy.squeeze(self.model.get_tensor(td['index'])) for td in self.output_details]
         # print(scores, bboxes, classes)
-        return numpy.hstack((
-            classes[:, numpy.newaxis],
-            scores[:, numpy.newaxis],
-            bboxes))
+        return numpy.hstack((0,scores[0],bboxes[0]))
 
 
 class TFLiteServer(sharedmem.SharedMemoryServer):
