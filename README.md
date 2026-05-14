@@ -13,24 +13,9 @@
 
 Install the latest Pi OS using Raspberry Pi Imager. During setup, configure locale, timezone, keyboard, hostname, and SSH.
 
-# Environment variables
-
-Add the following lines to the **top** of `~/.bashrc` (before the `if not running interactively` block) to set the web UI login credentials:
-
-```bash
-sudo nano ~/.bashrc
-```
-
-```bash
-export PCAM_USER="camera login user name"
-export PCAM_PASSWORD="camera login password"
-```
-
-Save and exit with `Ctrl+X`, then `Y`.
-
 # Install
 
-## 1. System dependencies (apt — required before pip)
+## 1. System dependencies 
 
 These packages are not available on PyPI and must be installed via apt:
 
@@ -85,10 +70,13 @@ sudo autopolls-install
 
 The installer:
 - Checks that all apt dependencies are present
+- Prompts for camera username and password, saves to `~/.config/autopolls/credentials` (mode 600)
 - Copies the default config to `~/Desktop/configs` (if not already present)
-- Writes patched `.service` files to `/etc/systemd/system/` (correct user and paths)
+- Writes patched `.service` files to `/etc/systemd/system/` (correct user, paths, and credentials file)
 - Enables services to start on boot
-- Configures nginx
+- Configures nginx and htpasswd for the web UI
+
+No `~/.bashrc` edits are needed for credentials.
 
 Follow the printed instructions for any remaining manual steps.
 

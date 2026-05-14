@@ -11,13 +11,15 @@ import socket
 
 import requests
 
+from . import credentials
+
 
 def build_camera_url(
         ip, user=None, password=None, channel=1, subtype=0):
     if user is None:
-        user = os.environ['PCAM_USER']
+        user = credentials.get_user()
     if password is None:
-        password = os.environ['PCAM_PASSWORD']
+        password = credentials.get_password()
     return (
         "rtsp://{user}:{password}@{ip}:554"
         "/cam/realmonitor?channel={channel}&subtype={subtype}".format(
@@ -38,8 +40,8 @@ def initial_configuration(c, reboot=True):
     # TODO pull out a 'config' structure that contains settings
     # TODO add error checking
     config_result = {}
-    if c.password != os.environ['PCAM_PASSWORD']:
-        r = c.set_password(os.environ['PCAM_PASSWORD'])
+    if c.password != credentials.get_password():
+        r = c.set_password(credentials.get_password())
         config_result['password'] = r
 
     # set current time
@@ -246,9 +248,9 @@ class DahuaCameraError(Exception):
 class DahuaCamera:
     def __init__(self, ip, user=None, password=None):
         if user is None:
-            user = os.environ['PCAM_USER']
+            user = credentials.get_user()
         if password is None:
-            password = os.environ['PCAM_PASSWORD']
+            password = credentials.get_password()
         self.user = user
         self.password = password
         self.ip = ip

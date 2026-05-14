@@ -5,6 +5,7 @@ After=network.target
 [Service]
 User=@@INSTALL_USER@@
 Group=@@INSTALL_USER@@
+EnvironmentFile=@@CREDS_PATH@@
 ExecStart=@@VENV_BIN@@/pcam-discover
 RestartSec=300
 Restart=always

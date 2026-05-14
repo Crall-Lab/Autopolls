@@ -4,10 +4,10 @@ autopolls-config   — launch the config file GUI editor.
 
 autopolls-install must be run with sudo so it can write to /etc/systemd/system/
 and /etc/nginx/sites-enabled/.  It reads the *invoking* user from SUDO_USER so
-that paths are resolved correctly for the actual human account.
+that paths and the credentials file are resolved for the actual human account.
 """
 
-import grp
+import getpass
 import os
 import pwd
 import shutil
@@ -19,10 +19,10 @@ from pathlib import Path
 # Paths derived from the package layout
 # ---------------------------------------------------------------------------
 
-REPO_ROOT   = Path(__file__).parent.parent          # Autopolls/
-PCAM_DIR    = REPO_ROOT / 'pcam'                    # Autopolls/pcam/
+REPO_ROOT    = Path(__file__).parent.parent         # Autopolls/
+PCAM_DIR     = REPO_ROOT / 'pcam'                   # Autopolls/pcam/
 SERVICES_DIR = PCAM_DIR / 'services'                # Autopolls/pcam/services/
-UTILS_DIR   = REPO_ROOT / 'utils'                   # Autopolls/utils/
+UTILS_DIR    = REPO_ROOT / 'utils'                  # Autopolls/utils/
 
 APT_DEPS = [
     'python3-gst-1.0',
@@ -36,7 +36,7 @@ APT_DEPS = [
     'libsystemd-dev',
 ]
 
-SERVICES_TO_LINK = [
+SERVICES_TO_WRITE = [
     'tfliteserve.service',
     'pcam-discover.service',
     'pcam-overview.service',
@@ -83,7 +83,6 @@ def _get_install_user():
     if sudo_user:
         pw = pwd.getpwnam(sudo_user)
         return pw.pw_name, Path(pw.pw_dir)
-    # Not running under sudo — use current user
     pw = pwd.getpwuid(os.getuid())
     return pw.pw_name, Path(pw.pw_dir)
 
@@ -94,7 +93,6 @@ def _get_venv_bin():
 
 
 def _render_service(template_path: Path, replacements: dict) -> str:
-    """Read a service file template and apply string replacements."""
     text = template_path.read_text()
     for key, value in replacements.items():
         text = text.replace(key, value)
@@ -112,7 +110,6 @@ def check_apt_deps():
         result = _run(['dpkg', '-l', pkg], check=False, capture_output=True)
         if result.returncode != 0:
             missing.append(pkg)
-
     if missing:
         _print_warn('The following apt packages are missing:')
         print()
@@ -121,6 +118,58 @@ def check_apt_deps():
         _print_warn('Install them and re-run autopolls-install.')
         sys.exit(1)
     _print_ok('All apt dependencies present')
+
+
+def setup_credentials(user_home: Path, username: str):
+    """Prompt for camera credentials and write to ~/.config/autopolls/credentials."""
+    _print_header('Camera credentials')
+
+    creds_dir  = user_home / '.config' / 'autopolls'
+    creds_path = creds_dir / 'credentials'
+
+    if creds_path.exists():
+        answer = input(
+            f'    Credentials already exist at {creds_path}.\n'
+            '    Update them? [y/N] '
+        ).strip().lower()
+        if answer != 'y':
+            _print_ok('Keeping existing credentials')
+            return _read_credentials(creds_path)
+
+    print(
+        '\n    These credentials are used to authenticate with Dahua IP cameras\n'
+        '    and to protect the web UI.\n'
+    )
+
+    cam_user = input('    Camera username: ').strip()
+    while True:
+        cam_pass  = getpass.getpass('    Camera password: ')
+        cam_pass2 = getpass.getpass('    Confirm password: ')
+        if cam_pass == cam_pass2:
+            break
+        print('    Passwords do not match, try again.')
+
+    creds_dir.mkdir(parents=True, exist_ok=True)
+    creds_path.write_text(
+        f'PCAM_USER={cam_user}\n'
+        f'PCAM_PASSWORD={cam_pass}\n'
+    )
+    # Owned by the real user, readable only by them
+    uid = pwd.getpwnam(username).pw_uid
+    os.chown(creds_path, uid, -1)
+    creds_path.chmod(0o600)
+
+    _print_ok(f'Credentials written to {creds_path}')
+    return cam_user, cam_pass
+
+
+def _read_credentials(creds_path: Path):
+    result = {}
+    for line in creds_path.read_text().splitlines():
+        if '=' in line and not line.startswith('#'):
+            k, _, v = line.partition('=')
+            result[k.strip()] = v.strip()
+    return result.get('PCAM_USER', ''), result.get('PCAM_PASSWORD', '')
 
 
 def copy_default_config(user_home: Path):
@@ -141,23 +190,22 @@ def copy_default_config(user_home: Path):
 def install_services(username: str, user_home: Path, venv_bin: Path):
     _print_header('Installing systemd service files')
 
+    creds_path = user_home / '.config' / 'autopolls' / 'credentials'
     replacements = {
         '@@INSTALL_USER@@': username,
         '@@VENV_BIN@@':     str(venv_bin),
         '@@PCAM_DIR@@':     str(PCAM_DIR),
+        '@@CREDS_PATH@@':   str(creds_path),
     }
 
     systemd_dir = Path('/etc/systemd/system')
-
-    for svc_name in SERVICES_TO_LINK:
+    for svc_name in SERVICES_TO_WRITE:
         template = SERVICES_DIR / svc_name
         if not template.exists():
             _print_warn(f'{svc_name} not found in {SERVICES_DIR}, skipping')
             continue
-
         dest = systemd_dir / svc_name
-        rendered = _render_service(template, replacements)
-        dest.write_text(rendered)
+        dest.write_text(_render_service(template, replacements))
         _print_ok(f'Wrote {dest}')
 
     _run(['systemctl', 'daemon-reload'])
@@ -171,7 +219,7 @@ def enable_services():
         _print_ok(f'Enabled {svc}')
 
 
-def setup_nginx(user_home: Path):
+def setup_nginx():
     _print_header('Configuring nginx')
     nginx_src  = SERVICES_DIR / 'pcam-ui.nginx'
     nginx_dest = Path('/etc/nginx/sites-enabled/pcam-ui')
@@ -189,17 +237,15 @@ def setup_nginx(user_home: Path):
     _print_ok('nginx restarted')
 
 
-def setup_htpasswd():
+def setup_htpasswd(password: str):
     _print_header('Web UI password')
-    pcam_password = os.environ.get('PCAM_PASSWORD', '')
-    if not pcam_password:
-        _print_warn('PCAM_PASSWORD not set — skipping htpasswd setup')
-        _print_step('Set it in ~/.bashrc and re-run, or run manually:')
-        _print_step('  sudo htpasswd -bc /etc/apache2/.htpasswd pcam <password>')
+    if not password:
+        _print_warn('No password provided — skipping htpasswd setup')
+        _print_step('Run manually: sudo htpasswd -bc /etc/apache2/.htpasswd pcam <password>')
         return
     htpasswd = Path('/etc/apache2/.htpasswd')
     htpasswd.parent.mkdir(parents=True, exist_ok=True)
-    _run(['htpasswd', '-bc', str(htpasswd), 'pcam', pcam_password])
+    _run(['htpasswd', '-bc', str(htpasswd), 'pcam', password])
     _print_ok('htpasswd configured')
 
 
@@ -244,11 +290,12 @@ def main():
     print(f'  Repo:     {REPO_ROOT}')
 
     check_apt_deps()
+    _, password = setup_credentials(user_home, username)
     copy_default_config(user_home)
     install_services(username, user_home, venv_bin)
     enable_services()
-    setup_nginx(user_home)
-    setup_htpasswd()
+    setup_nginx()
+    setup_htpasswd(password)
     print_manual_steps()
 
     print('\033[1;32m\nInstall complete.\033[0m\n')

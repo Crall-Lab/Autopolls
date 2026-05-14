@@ -18,6 +18,8 @@ import sys
 import time
 import threading
 
+from . import credentials
+
 import gi
 gi.require_version('Gst', '1.0')
 from gi.repository import Gst, GLib, GObject
@@ -293,8 +295,8 @@ class GSTRecorder(threading.Thread):
 
 def test_recorder(ip='192.168.0.4'):
     url = url_string.format(
-        user=os.environ['PCAM_USER'],
-        password=os.environ['PCAM_PASSWORD'],
+        user=credentials.get_user(),
+        password=credentials.get_password(),
         ip=ip)
 
     class Ticker:
@@ -335,8 +337,8 @@ def test_recorder(ip='192.168.0.4'):
 
 def test_for_open_files(ip='192.168.0.103'):
     url = url_string.format(
-        user=os.environ['PCAM_USER'],
-        password=os.environ['PCAM_PASSWORD'],
+        user=credentials.get_user(),
+        password=credentials.get_password(),
         ip=ip)
 
     # get process id
