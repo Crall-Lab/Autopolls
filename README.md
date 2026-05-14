@@ -39,7 +39,6 @@ git clone https://github.com/Crall-Lab/Autopolls.git
 *NB select 'y' if prompted whether you want to continue...
 
 # Install pre-requisites
-
 ```bash
 sudo apt update
 sudo apt install python3-numpy python3-opencv python3-requests python3-flask python3-systemd nginx-full vsftpd virtualenvwrapper apache2-utils python3-gst-1.0 gstreamer1.0-tools nmap jq
@@ -63,12 +62,10 @@ sudo apt install libsystemd-dev
 # Install tfliteserve
 
 ```bash
-
 cd ~/Autopolls/tfliteserve
 #git clone https://github.com/braingram/tfliteserve.git
 
 # Latest installs have required previous setuptools version
-#pip3 install setuptools==65.7.0
 pip3 install setuptools
 
 # the following tflite runtime installation instructions are from here: https://www.tensorflow.org/lite/guide/python
@@ -213,6 +210,11 @@ sudo chmod 775 ~/AP/Autopolls/tempSensor.py
 sudo mv ~/AP/Autopolls/tempSensor.py ~/daqhats/examples/python/mcc134/tempSensor.py
 ```
 Open crontab ('crontab -e' in Terminal) and add this line to the bottom of the script:
+
+```bash
+crontab -e
+```
+
 ```bash
 * * * * * sudo python3 ~/daqhats/examples/python/mcc134/tempSensor.py
 ```
