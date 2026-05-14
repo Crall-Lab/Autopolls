@@ -83,7 +83,8 @@ default_cfg = {
 data_dir = '/mnt/data/'
 
 # Loading in new config file settings
-customSetting = '/home/pi/Desktop/configs'
+#customSetting = '/home/pi/Desktop/configs'
+customSetting = os.path.join(os.path.expanduser('~'), 'Desktop', 'configs')
 if os.path.isfile(customSetting):
     in1 = open(customSetting,'r')
     settingsL = json.load(in1)

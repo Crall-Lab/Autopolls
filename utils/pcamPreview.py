@@ -5,7 +5,7 @@ import json
 import time
 import numpy as np
 import argparse
-
+import os
 
 def usb_bus_to_id(bus_string):
     return bus_string.split('-')[-1].replace('.', '_')
@@ -65,7 +65,7 @@ def main():
     tlapse = parser.parse_args().time
     f1 = parser.parse_args().focus
     if f1 == None:
-        customSetting = '/home/pi/Desktop/configs'
+        customSetting = os.path.join(os.path.expanduser('~'), 'Desktop', 'configs')#'/home/pi/Desktop/configs'
         in1 = open(customSetting,'r')
         settingsL = json.load(in1)
         in1.close()
