@@ -1,13 +1,12 @@
 [Unit]
-Description=uWSGI instance to serve pcam ui
+Description=uWSGI instance to serve pcam UI
 After=network.target nginx.service systemd-tmpfiles-setup.service
 
 [Service]
-User=pi
-Group=pi
-WorkingDirectory=%h/AP/Autopolls/
-ExecStart=/bin/bash -c "PATH=%h/.virtualenvs/autopolls/bin:$PATH exec %h/.virtualenvs/autopolls/bin/uwsgi --ini pcam-ui.ini"
+User=@@INSTALL_USER@@
+Group=@@INSTALL_USER@@
+WorkingDirectory=@@PCAM_DIR@@
+ExecStart=@@VENV_BIN@@/uwsgi --ini @@PCAM_DIR@@/pcam-ui.ini
 
 [Install]
 WantedBy=multi-user.target
-

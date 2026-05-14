@@ -3,9 +3,9 @@ Description=pollinatorcamera[%i]
 After=network.target
 
 [Service]
-User=pi
-Group=pi
-ExecStart=%h/AP/Autopolls/services/run_pcam.sh %i
+User=@@INSTALL_USER@@
+Group=@@INSTALL_USER@@
+ExecStart=@@VENV_BIN@@/pcam-run %i
 RestartSec=60
 Restart=always
 StandardOutput=file:/mnt/data/logs/%i.out

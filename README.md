@@ -15,7 +15,7 @@ Install the latest Pi OS using Raspberry Pi Imager. During setup, configure loca
 
 # Environment variables
 
-Several environment variables are required to access the AutoPollS UI. Add the following lines to the **top** of your `~/.bashrc` (before the `if not running interactively` block):
+Add the following lines to the **top** of `~/.bashrc` (before the `if not running interactively` block) to set the web UI login credentials:
 
 ```bash
 sudo nano ~/.bashrc
@@ -28,101 +28,118 @@ export PCAM_PASSWORD="camera login password"
 
 Save and exit with `Ctrl+X`, then `Y`.
 
-# Clone this repository
+# Install
 
-```bash
-. ~/.bashrc
-cd
-git clone https://github.com/Crall-Lab/Autopolls.git
-```
+## 1. System dependencies (apt — required before pip)
 
-*Note: select `y` if prompted to continue.*
-
-# Install pre-requisites
+These packages are not available on PyPI and must be installed via apt:
 
 ```bash
 sudo apt update
-sudo apt install python3-numpy python3-opencv python3-requests python3-flask python3-systemd nginx-full vsftpd virtualenvwrapper apache2-utils python3-gst-1.0 gstreamer1.0-tools nmap jq
-echo "source /usr/share/virtualenvwrapper/virtualenvwrapper.sh" >> ~/.bashrc
+sudo apt install \
+  python3-gst-1.0 python3-systemd python3-tflite-runtime \
+  libedgetpu1-std libsystemd-dev \
+  nginx-full vsftpd \
+  virtualenvwrapper apache2-utils \
+  nmap jq
 ```
 
-# Setup virtualenv
+## 2. Virtualenv
 
 ```bash
 . ~/.bashrc
 mkvirtualenv --system-site-packages autopolls -p `which python3`
-workon autopolls
 echo "source ~/.virtualenvs/autopolls/bin/activate" >> ~/.bashrc
+workon autopolls
 ```
 
-# Install pandas and libsystemd
+## 3. Clone and pip install
 
 ```bash
-pip install pandas
-sudo apt install libsystemd-dev
+. ~/.bashrc
+cd ~
+git clone https://github.com/Crall-Lab/Autopolls.git
+cd Autopolls
+pip install -e tfliteserve/ -e pcam/ -e .
 ```
 
-# Install tfliteserve
+This installs three packages (`tfliteserve`, `pollinatorcam`, `autopolls`) and
+registers the following commands in the virtualenv:
+
+| Command | Description |
+|---|---|
+| `autopolls-install` | System setup (run once with sudo, see below) |
+| `autopolls-config` | Open the config file GUI editor |
+| `pcam-run <ip>` | Start a camera grabber for a given IP or `/dev/videoX` |
+| `pcam-discover` | Scan the network for cameras and start services |
+| `tfliteserve-server` | Start the TFLite inference server |
+
+## 4. System setup
+
+Run the installer once to configure service files, set up nginx, and copy the
+default config. It requires sudo to write to `/etc/systemd/system/`:
 
 ```bash
-cd ~/Autopolls/tfliteserve
-
-# Latest installs may require a pinned setuptools version
-pip3 install setuptools
-
-# Install Edge TPU support
-echo "deb https://packages.cloud.google.com/apt coral-edgetpu-stable main" | sudo tee /etc/apt/sources.list.d/coral-edgetpu.list
-curl https://packages.cloud.google.com/apt/doc/apt-key.gpg | sudo apt-key add -
-sudo apt-get update
-sudo apt-get install libedgetpu1-std
-
-# Install the tfliteserve package
-pip3 install -e .
+sudo autopolls-install
 ```
 
-# Install the pcam (Autopolls) package
+The installer:
+- Checks that all apt dependencies are present
+- Copies the default config to `~/Desktop/configs` (if not already present)
+- Writes patched `.service` files to `/etc/systemd/system/` (correct user and paths)
+- Enables services to start on boot
+- Configures nginx
+
+Follow the printed instructions for any remaining manual steps.
+
+## 5. Edit config
 
 ```bash
-cd ~/Autopolls/pcam
-pip install -e .
-pip install uwsgi
+autopolls-config
 ```
 
-# Copy default config to Desktop
+Or edit `~/Desktop/configs` directly (it's a JSON file). Key fields:
 
-```bash
-sudo cp ~/Autopolls/utils/configs ~/Desktop/configs
-sudo chmod 777 ~/Desktop/configs
-```
+| Field | Type | Description |
+|---|---|---|
+| `hostname` | string | Device hostname (written to `/etc/hostname` on startup) |
+| `model_inference` | 0/1 | Enable TFLite detection |
+| `classes` | `single`/`multi` | Bee-only or multi-insect model |
+| `coral` | 0/1 | Use Coral Edge TPU accelerator |
+| `threshold` | 0.0–1.0 | Detection confidence threshold |
+| `periodic_still` | int (s) | Save a still image every N seconds |
+| `autofocus` | 0/1 | Enable camera autofocus |
+| `focus` | 1–999 | Manual focus position (larger = closer) |
+| `csv` | 0/1 | Save detections as CSV (vs JSON) |
+| `save_all_detections` | 0/1 | Save every detection, not just triggered events |
 
-To edit config values, use the included GUI editor:
-```bash
-python3 ~/Autopolls/utils/config_editor.py
-```
+---
 
 # Setup storage location
 
-You will need a properly formatted external hard drive. The instructions below format the drive directly on the Pi — **this will erase all existing data on the drive**. If your drive is already formatted, skip to the "Mount storage location" section.
+You will need a properly formatted external hard drive. The instructions below
+format the drive on the Pi — **this will erase all existing data**. If your
+drive is already formatted, skip to "Mount storage location".
 
-1. Connect your external USB hard drive to the Pi.
-2. The software assumes the drive is at `/dev/sda1`. Confirm with:
+1. Connect the USB hard drive to the Pi.
+2. Confirm the drive is at `/dev/sda1`:
 ```bash
 sudo fdisk -l
 ```
-3. Unmount and reformat as NTFS (supports >2 TB volumes):
+3. Unmount and reformat as NTFS (supports >2 TB):
 ```bash
 sudo umount /dev/sda1
 sudo fdisk /dev/sda
 ```
 
-Inside `fdisk`, run these commands in order:
+Inside `fdisk`, run in order:
 - `g` — switch to GPT
 - `d` — delete existing partitions (if any)
-- `n` — create a new partition (press Enter three times to accept all defaults)
-- `t` then `11` — set partition type to Microsoft Basic Data
-- `w` — write changes and exit
+- `n` — new partition (press Enter three times to accept defaults)
+- `t` then `11` — set type to Microsoft Basic Data
+- `w` — write and exit
 
-4. Create the NTFS filesystem:
+4. Create the filesystem:
 ```bash
 sudo mkfs.ntfs -f /dev/sda1
 ```
@@ -145,78 +162,24 @@ sudo chmod 775 /mnt/data
 sudo chmod 777 /etc/hostname
 ```
 
-# Setup web server (for UI)
+## Add cron job to repair /dev/sda1 if corrupted
 
-```bash
-sudo htpasswd -bc /etc/apache2/.htpasswd pcam $PCAM_PASSWORD
-sudo rm /etc/nginx/sites-enabled/default
-sudo ln -s ~/Autopolls/services/pcam-ui.nginx /etc/nginx/sites-enabled/
-```
-
-# Setup systemd services
-
-Run the configuration script to set the correct username in all service files:
-
-```bash
-bash ~/Autopolls/pcam/services/configure_services.sh
-```
-
-Then symlink the services into systemd, enable them on boot, and start them:
-
-```bash
-cd ~/Autopolls/pcam/services
-for S in \
-    tfliteserve.service \
-    pcam-discover.service \
-    pcam-overview.service \
-    pcam-overview.timer \
-    pcam@.service \
-    pcam-ui.service; do \
-  sudo ln -s ~/Autopolls/pcam/services/$S /etc/systemd/system/$S
-done
-
-# Enable services to run on boot
-for S in \
-    tfliteserve.service \
-    pcam-discover.service \
-    pcam-overview.timer \
-    pcam-ui.service; do \
-  sudo systemctl enable $S
-done
-
-# Start services
-for S in \
-    tfliteserve.service \
-    pcam-discover.service \
-    pcam-ui.service; do \
-  sudo systemctl start $S
-done
-
-sudo systemctl restart nginx
-```
-
-*Note: the overview service and timer are not needed for USB cameras and may be removed in a future update.*
-
-# Add script to fix and remount /dev/sda1 if corrupted
-
-NTFS corruption can occur after extended use. The following cron job monitors and repairs the mount automatically.
-
-Open crontab (`crontab -e`) and add this line:
+Open crontab (`crontab -e`) and add:
 
 ```
 * * * * * sudo python3 ~/Autopolls/utils/mountFix.py
 ```
 
-# Install MCC134 libraries and script (optional)
+---
 
-Attach the MCC134 thermocouple board to the Pi's 40-pin GPIO, then run:
+# Install MCC134 thermocouple board (optional)
+
+Attach the MCC134 to the Pi's 40-pin GPIO, then:
 
 ```bash
-cd ~
 sudo apt-get install libraspberrypi-dev raspberrypi-kernel-headers
-git clone https://github.com/mccdaq/daqhats.git
-cd ~/daqhats
-sudo ./install.sh
+git clone https://github.com/mccdaq/daqhats.git ~/daqhats
+cd ~/daqhats && sudo ./install.sh
 ```
 
 If the libraries do not install automatically:
@@ -227,74 +190,73 @@ deactivate
 sudo pip install daqhats --break-system-packages
 ```
 
-Move the temperature sensor script into the daqhats example directory:
+Move the temperature sensor script and add a cron job:
 
 ```bash
 sudo chmod 775 ~/Autopolls/utils/tempSensor.py
 sudo mv ~/Autopolls/utils/tempSensor.py ~/daqhats/examples/python/mcc134/tempSensor.py
 ```
 
-Open crontab (`crontab -e`) and add this line:
+Open crontab (`crontab -e`) and add:
 
 ```
 * * * * * sudo python3 ~/daqhats/examples/python/mcc134/tempSensor.py
 ```
 
-Reboot, then confirm readings are being recorded:
+Reboot and confirm readings appear in `/mnt/data/tempProbes/`.
 
-```bash
-sudo reboot -h now
-# After reboot:
-sudo python3 ~/daqhats/examples/python/mcc134/tempSensor.py
-```
+---
 
-A folder `/mnt/data/tempProbes` should appear containing a CSV with hostname and temperature readings.
+# Install wittyPi power scheduler (optional)
 
-# Install wittyPi libraries and script (optional)
-
-Attach the wittyPi on top of the thermocouple board's 40-pin GPIO. If using an older wittyPi, replace `WittyPi4` with `WittyPi3`.
+Attach the wittyPi on top of the thermocouple board. Replace `WittyPi4` with
+`WittyPi3` if using an older model.
 
 ```bash
 wget http://www.uugear.com/repo/WittyPi4/install.sh
 sudo sh install.sh
 ```
 
-Reboot, then activate the schedule:
+After rebooting:
 
 ```bash
 sudo mv ~/Autopolls/utils/schedule.wpi ~/wittypi/schedule.wpi
 sudo ~/wittypi/runScript.sh
 ```
 
-# Viewing cameras — option 1: preview script
+---
 
-To preview attached cameras and check orientation and focus, run:
+# Viewing cameras
+
+## Option 1: preview script
 
 ```bash
 python3 ~/Autopolls/utils/pcamPreview.py -t 30
 ```
 
-This shows a 30-second preview. Adjust `-t` to change the duration. Use `-f <value>` to test a specific focal distance; if omitted, the value from `~/Desktop/configs` is used.
+Shows a 30-second preview. Use `-f <value>` to test a focus distance; if
+omitted, the value from `~/Desktop/configs` is used.
 
-# Viewing cameras — option 2: web UI
+## Option 2: web UI
 
-Open a browser on the Pi and navigate to `127.0.0.1`. Log in with the credentials set in `PCAM_USER` / `PCAM_PASSWORD`. This provides an overview of recent detections (not a real-time camera feed).
+Open `http://127.0.0.1` in the Pi's browser (or `http://<pi-ip>` from another
+device on the same network). Log in with the credentials set in `PCAM_USER` /
+`PCAM_PASSWORD`.
+
+---
 
 # Troubleshooting
 
-### systemd errors
 ```bash
-pip3 install systemd
-```
-
-### Check service status
-```bash
-# Check that the model loaded and is running
+# Check that the inference server loaded correctly
 sudo systemctl status tfliteserve.service
 
-# Check a specific camera (press Tab to autocomplete the IP)
+# Check a specific camera (Tab to autocomplete the IP)
 sudo systemctl status pcam@
 
-# View logs for a service
-sudo journalctl -au pcam-discover
+# Stream logs for a service
+sudo journalctl -fu pcam-discover
+
+# If systemd Python bindings are missing
+pip3 install systemd
 ```

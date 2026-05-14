@@ -1,0 +1,22 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.backends.legacy:build"
+
+[project]
+name = "autopolls"
+version = "0.1.0"
+description = "Raspberry Pi pollinator monitoring system"
+readme = "README.md"
+requires-python = ">=3.9"
+dependencies = [
+    "pollinatorcam",
+    "tfliteserve",
+]
+
+[project.scripts]
+autopolls-install = "autopolls.install:main"
+autopolls-config  = "autopolls.install:config_main"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["autopolls*"]

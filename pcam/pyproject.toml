@@ -1,18 +1,32 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.backends.legacy:build"
+
 [project]
-name = 'pollinatorcam'
-version = '0.0.1'
-dependencies = ["numpy",
-"pygst",
-"opencv-python",
-"Pillow",
-"requests",
-"tfliteserve",
-"flask",
-"uwsgi",
-"systemd"]
+name = "pollinatorcam"
+version = "0.1.0"
+requires-python = ">=3.9"
+dependencies = [
+    # Pure pip deps
+    "numpy",
+    "Pillow",
+    "requests",
+    "flask",
+    "uwsgi",
+    "pandas",
+    "tfliteserve",
+    # apt-preferred on Pi (pip fallbacks work on other platforms):
+    #   python3-opencv  →  opencv-python
+    #   python3-systemd →  systemd
+    #   python3-gst-1.0 →  (no pip equivalent, must be apt)
+    "opencv-python",
+    "systemd",
+]
+
+[project.scripts]
+pcam-run      = "pollinatorcam.runner:run"
+pcam-discover = "pollinatorcam.runner:run_discover"
 
 [tool.setuptools.packages.find]
 where = ["."]
-include = ["*"]
-exclude = ['services', 'testModels','iNatFull_1class',
-           'tflite_20220630_1', 'universal_bee_model']
+include = ["pollinatorcam*"]

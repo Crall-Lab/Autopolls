@@ -1,12 +1,14 @@
 [Unit]
-Description=tfliteserve server
+Description=tfliteserve inference server
 After=network.target
 
 [Service]
-User=pi
-ExecStart=%h/AP/Autopolls/services/run_tfliteserve.sh
+User=@@INSTALL_USER@@
+ExecStart=@@VENV_BIN@@/tfliteserve-server
 RestartSec=10
 Restart=always
+StandardOutput=journal
+StandardError=journal
 
 [Install]
 WantedBy=multi-user.target

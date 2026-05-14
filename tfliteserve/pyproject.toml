@@ -1,10 +1,22 @@
-[project]
-name = 'tfliteserve'
-version = '0.0.1'
-dependencies = []
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.backends.legacy:build"
 
+[project]
+name = "tfliteserve"
+version = "0.1.0"
+requires-python = ">=3.9"
+dependencies = [
+    "numpy",
+    # tflite-runtime is not on PyPI for ARM — install via apt:
+    #   sudo apt install python3-tflite-runtime
+    # or download a wheel from tensorflow.org/lite/guide/python
+]
+
+[project.scripts]
+tfliteserve-server = "tfliteserve.runner:run"
 
 [tool.setuptools.packages.find]
 where = ["."]
-include = ["*"]
-exclude = ['2020_0123_2035_CNN', 'tflite_20220630_1','universal_bee_model']
+include = ["tfliteserve*"]
+exclude = ["tfliteserve.__pycache__"]
