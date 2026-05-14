@@ -180,7 +180,7 @@ The following scripts should look for this file error and fix it.
 
 In terminal open crontab, via "crontab -e", at the bottom of the file include:
 ```
-* * * * * sudo python3 /home/pi/AP/Autopolls/mountFix.py
+* * * * * sudo python3 ~/AP/Autopolls/mountFix.py
 ```
 
 
@@ -206,8 +206,8 @@ sudo pip install daqhats --break-system-packages
 ```
 
 ```bash
-sudo chmod 775 ~/AP/Autopolls/tempSensor.py
-sudo mv ~/AP/Autopolls/tempSensor.py ~/daqhats/examples/python/mcc134/tempSensor.py
+sudo chmod 775 ~/Autopolls/tempSensor.py
+sudo mv ~/Autopolls/tempSensor.py ~/daqhats/examples/python/mcc134/tempSensor.py
 ```
 Open crontab ('crontab -e' in Terminal) and add this line to the bottom of the script:
 
@@ -238,13 +238,13 @@ sudo sh install.sh
 
 Reboot your pi again (manually, or using 'sudo reboot -h now'), then run the following command in Terminal:
 ```bash
-sudo mv ~/AP/Autopolls/schedule.wpi ~/wittypi/schedule.wpi
+sudo mv ~/Autopolls/schedule.wpi ~/wittypi/schedule.wpi
 sudo ~/wittypi/runScript.sh
 ```
 # Viewing cameras option 1: camera view and focus
 To view the four cameras and check orientation and focus, run the following command in terminal:
 ```bash
-python ~/AP/Autopolls/pcamPreview.py -t 30
+python ~/Autopolls/pcamPreview.py -t 30
 ```
 This will give you a (30-second) preview of the cameras you have attached. You can adjust the '-t' parameters to change the length of the preview. To test focal distance values, you can use the optional -f input value. If not value for -f is input, the script will default to pulling the focal distance specified in the config file on the Desktop.
 
