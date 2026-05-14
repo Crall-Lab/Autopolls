@@ -5,7 +5,7 @@ After=network.target
 [Service]
 User=pi # change to username
 Group=pi # change to your username
-ExecStart=%h/AP/Autopolls/services/run_discover.sh
+ExecStart=%h/Autopolls/pcam/services/run_discover.sh
 #TODO make this a timer
 RestartSec=300
 Restart=always

@@ -33,8 +33,7 @@ After you have added these lines at the top of your bashrc script, you can save 
 Prepare for and clone this repository
 ```bash
 . ~/.bashrc
-mkdir -p ~/AP
-cd ~/AP
+cd
 git clone https://github.com/Crall-Lab/Autopolls.git
 ```
 *NB select 'y' if prompted whether you want to continue...
@@ -64,8 +63,8 @@ sudo apt install libsystemd-dev
 # Install tfliteserve
 
 ```bash
-mkdir -p ~/AP
-cd ~/AP/tfliteserve
+
+cd ~/Autopolls/tfliteserve
 #git clone https://github.com/braingram/tfliteserve.git
 
 # Latest installs have required previous setuptools version
@@ -79,34 +78,25 @@ echo "deb https://packages.cloud.google.com/apt coral-edgetpu-stable main" | sud
 curl https://packages.cloud.google.com/apt/doc/apt-key.gpg | sudo apt-key add -
 sudo apt-get update
 #sudo apt install python3-tflite-runtime
-pip install tflite-runtime==2.14.0
 sudo apt-get install libedgetpu1-std
 
+# Install the tfliteserve package
 pip3 install -e .
-# get model (TODO 404 permission denied, host this in repo or publicly)
-#wget https://github.com/braingram/tfliteserve/releases/download/v0.1/200123_2035_model.tar.xz
-#tar xvJf 200123_2035_model.tar.xz
+
 ```
 
-# Install this repository
+# Install the pcam (Autopolls) repository
 
 ```bash
-cd ~/AP/Autopolls
+cd ~/Autopolls/pcam
 pip install -e .
 pip install uwsgi
 ```
 
 Move util scripts to tfliteserve folder
 ```bash
-sudo cp /home/pi/AP/utils/configs /home/pi/Desktop/configs
-sudo cp /home/pi/AP/utils/pcamPreview.py /home/pi/pcamPreview.py
-sudo chmod 777 /home/pi/Desktop/configs
-sudo chmod 777 /home/pi/AP/tfliteserve/tflite_2023/
-```
-
-Install json reading package
-```bash
-sudo apt-get install jq
+sudo cp ~/Autopolls/utils/configs ~/Desktop/configs
+sudo chmod 777 ~/Desktop/configs
 ```
 
 # Setup storage location
@@ -152,14 +142,14 @@ sudo chmod 777 /etc/hostname
 ```bash
 sudo htpasswd -bc /etc/apache2/.htpasswd pcam $PCAM_PASSWORD
 sudo rm /etc/nginx/sites-enabled/default
-sudo ln -s /home/pi/AP/Autopolls/services/pcam-ui.nginx /etc/nginx/sites-enabled/
+sudo ln -s ~Autopolls/services/pcam-ui.nginx /etc/nginx/sites-enabled/
 ```
 
 # Setup systemd services
 This will set up the systemd services to run the AutoPollS software in the background. NB: the overview service and timer are not needed for usb cameras, and may be removed in a future update
 
 ```bash
-cd ~/AP/Autopolls/services
+cd ~/Autopolls/services
 for S in \
     tfliteserve.service \
     pcam-discover.service \
@@ -167,7 +157,7 @@ for S in \
     pcam-overview.timer \
     pcam@.service \
     pcam-ui.service; do \
-  sudo ln -s ~/AP/Autopolls/services/$S /etc/systemd/system/$S
+  sudo ln -s ~/Autopolls/services/$S /etc/systemd/system/$S
 done
 # enable services to run on boot
 for S in \
