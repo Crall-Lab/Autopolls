@@ -33,7 +33,7 @@ Save and exit with `Ctrl+X`, then `Y`.
 ```bash
 . ~/.bashrc
 cd
-git clone https://github.com/Crall-Lab/Autopolls.git
+git clone https://github.com/Crall-Lab/Autopolls.git -b test
 ```
 
 *Note: select `y` if prompted to continue.*
