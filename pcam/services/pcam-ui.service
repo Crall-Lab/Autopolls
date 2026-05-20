@@ -5,8 +5,8 @@ After=network.target nginx.service systemd-tmpfiles-setup.service
 [Service]
 User=pi
 Group=pi
-WorkingDirectory=%h/Autopolls/pcam/
-ExecStart=/bin/bash -c "PATH=%h/.virtualenvs/autopolls/bin:$PATH exec %h/.virtualenvs/autopolls/bin/uwsgi --ini pcam-ui.ini"
+WorkingDirectory=home_dir/Autopolls/pcam/
+ExecStart=/bin/bash -c "PATH=home_dir/.virtualenvs/autopolls/bin:$PATH exec home_dir/.virtualenvs/autopolls/bin/uwsgi --ini pcam-ui.ini"
 
 [Install]
 WantedBy=multi-user.target

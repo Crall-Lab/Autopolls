@@ -2,11 +2,11 @@
 
 source $HOME/.virtualenvs/autopolls/bin/activate
 
-cd $HOME/AP/tfliteserve
+cd $HOME/Autopolls/tfliteserve
 
 # Read in model options
-CLASSES=`cat $HOME/Desktop/configs | jq '.classes'`
-CORAL=`cat $HOME/Desktop/configs | jq '.coral'`
+CLASSES=`cat $SERVICES_DIR/Desktop/configs | jq '.classes'`
+CORAL=`cat $SERVICES_DIR/Desktop/configs | jq '.coral'`
 
 if [[ $CLASSES == *"multi"* ]]; then
 	if [ $CORAL == 0 ]; then

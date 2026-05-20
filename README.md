@@ -58,7 +58,7 @@ echo "source ~/.virtualenvs/autopolls/bin/activate" >> ~/.bashrc
 # Install pandas and libsystemd
 
 ```bash
-pip install pandas
+pip install pandas ai_edge_litert
 sudo apt install libsystemd-dev
 ```
 

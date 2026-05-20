@@ -17,7 +17,7 @@ import time
 
 import cv2
 import numpy
-import systemd.daemon
+import systemd #.daemon
 import pandas
 
 import tfliteserve
@@ -177,8 +177,8 @@ class Grabber:
 
         self.in_systemd = in_systemd
         if self.in_systemd:
-            #systemd.daemon.notify(systemd.daemon.Notification.READY)
-            systemd.daemon.notify('READY=1')
+            systemd.daemon.notify(systemd.daemon.Notification.READY)
+            #systemd.daemon.notify('READY=1')
             self.reset_watchdog()
         logging.info("Process in systemd? %s", self.in_systemd)
 
@@ -457,7 +457,7 @@ class Grabber:
                 else:
                     x_1['still_filename'] = [meta['still_filename']]
                     x_1['detection'] = True
-                for detX1 in range(0,3):
+                for detX1 in range(0,2):
                     tempDet = 'class_%s'%detX1
                     #x_1[tempDet] = [meta['bboxes'][0][0][detX1][0]]
                     x_1[tempDet] = [bboxes[0][detX1][0]]
@@ -480,8 +480,8 @@ class Grabber:
     def reset_watchdog(self):
         if not self.in_systemd:
             return
-        #systemd.daemon.notify(systemd.daemon.Notification.WATCHDOG)
-        systemd.daemon.notify('WATCHDOG=1')
+        systemd.daemon.notify(systemd.daemon.Notification.WATCHDOG)
+        #systemd.daemon.notify('WATCHDOG=1')
         logging.debug("Reset watchdog")
 
     def generate_thumbnail(self, im):

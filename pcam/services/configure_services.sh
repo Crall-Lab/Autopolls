@@ -23,6 +23,7 @@ SERVICE_FILES=(
     "$SERVICES_DIR/pcam-overview.service"
     "$SERVICES_DIR/tfliteserve.service"
     "$SERVICES_DIR/pymicroclimate.service"
+    "$SERVICES_DIR/run_discover.sh"
 )
 
 for f in "${SERVICE_FILES[@]}"; do
@@ -34,6 +35,9 @@ for f in "${SERVICE_FILES[@]}"; do
     sed -i \
         -e "s|^User=.*|User=$TARGET_USER|" \
         -e "s|^Group=.*|Group=$TARGET_USER|" \
+        -e "s|home_dir/|/home/$TARGET_USER/|" \
+        -e "s|chown user|chown $TARGET_USER|" \
+        -e "s|chgrp user|chgrp $TARGET_USER|" \
         "$f"
     echo "  Updated: $(basename "$f")"
 done

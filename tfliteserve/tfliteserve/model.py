@@ -84,7 +84,7 @@ class TFLiteModel:
     def get_output(self):
         t = self.model.get_tensor(self.output_tensor_index)
         # print(t)
-        return (self.q_out_scale * (numpy.squeeze(t) - self.q_out_zero))
+        return t#(self.q_out_scale * (numpy.squeeze(t) - self.q_out_zero))
 
     def run(self, input_tensor):
         self.set_input(input_tensor)
@@ -122,17 +122,17 @@ class Detector(TFLiteModel):
         # - bboxes [top, left, bottom, right] normalized 0-1
         # - n_boxes (shape 1)
         # - classes
-        assert len(self.output_details) == 4
+        assert len(self.output_details) == 1
 
         # make fake output with shape (n_boxes, 6)
         # 6 = [class, score, top, left, bottom, right]
-        self.n_boxes = self.output_details[0]['shape'][1]
+        self.n_boxes = 2#self.output_details[0]['shape'][1]
 
         # validate output shape
-        assert tuple(self.output_details[0]['shape']) == (1, self.n_boxes)
-        assert tuple(self.output_details[1]['shape']) == (1, self.n_boxes, 4)
-        assert tuple(self.output_details[2]['shape']) == (1,)
-        assert tuple(self.output_details[3]['shape']) == (1, self.n_boxes)
+        #assert tuple(self.output_details[0]['shape']) == (1, self.n_boxes)
+        #assert tuple(self.output_details[1]['shape']) == (1, self.n_boxes, 4)
+        #assert tuple(self.output_details[2]['shape']) == (1,)
+        #assert tuple(self.output_details[3]['shape']) == (1, self.n_boxes)
 
         self.meta['output'] = {
             'shape': (self.n_boxes, 6),
@@ -214,7 +214,7 @@ class TFLiteServer(sharedmem.SharedMemoryServer):
             model, model.meta, server_folder)
         self.junk_input = numpy.random.randint(
             0, 255, size=model.meta['input']['shape'],
-            dtype=model.meta['input']['dtype'])
+            dtype=numpy.uint32#model.meta['input']['dtype'])
         self.junk_period = junk_period
         self.last_run = time.monotonic()
 

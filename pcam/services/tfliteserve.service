@@ -4,7 +4,7 @@ After=network.target
 
 [Service]
 User=pi
-ExecStart=%h/AP/Autopolls/services/run_tfliteserve.sh
+ExecStart=home_dir/Autopolls/services/run_tfliteserve.sh
 RestartSec=10
 Restart=always
 
