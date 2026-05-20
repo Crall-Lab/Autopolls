@@ -43,8 +43,8 @@ class CVCaptureThread(threading.Thread):
         #logging.info("Cap started with backend: %s", self.cap.getBackendName())
 
         # TODO settings should be dynamic to allow focus adjustment
-        if properties is not None:
-            self.set_properties(properties)
+        #if properties is not None:
+        #    self.set_properties(properties)
 
     def set_properties(self, properties, retries=5):
         # reorder list of property names to have some elements first
