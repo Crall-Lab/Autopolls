@@ -214,7 +214,7 @@ class TFLiteServer(sharedmem.SharedMemoryServer):
             model, model.meta, server_folder)
         self.junk_input = numpy.random.randint(
             0, 255, size=model.meta['input']['shape'],
-            dtype=numpy.uint32#model.meta['input']['dtype'])
+            dtype=numpy.uint32)#model.meta['input']['dtype'])
         self.junk_period = junk_period
         self.last_run = time.monotonic()
 
