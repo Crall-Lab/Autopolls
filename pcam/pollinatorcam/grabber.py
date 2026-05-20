@@ -457,16 +457,18 @@ class Grabber:
                 else:
                     x_1['still_filename'] = [meta['still_filename']]
                     x_1['detection'] = True
-                for detX1 in range(0,2):
-                    tempDet = 'class_%s'%detX1
-                    #x_1[tempDet] = [meta['bboxes'][0][0][detX1][0]]
-                    x_1[tempDet] = [bboxes[0][detX1][0]]
-                    tempDet = 'detect_%s'%detX1
-                    #x_1[tempDet] = [meta['bboxes'][0][0][detX1][1]]
-                    x_1[tempDet] = [bboxes[0][detX1][1]]
-                    tempDet = 'bbox_%s'%detX1
-                    #x_1[tempDet] = [meta['bboxes'][0][0][detX1][2]*numpy.array([1944,2592,1944,2592])]
-                    x_1[tempDet] = [bboxes[0][detX1][2]*numpy.array([1944,2592,1944,2592])]
+                    
+                    for detX1 in range(0,2):
+                        tempDet = 'class_%s'%detX1
+                        #x_1[tempDet] = [meta['bboxes'][0][0][detX1][0]]
+                        x_1[tempDet] = [bboxes[0][detX1][0]]
+                        tempDet = 'detect_%s'%detX1
+                        #x_1[tempDet] = [meta['bboxes'][0][0][detX1][1]]
+                        x_1[tempDet] = [bboxes[0][detX1][1]]
+                        tempDet = 'bbox_%s'%detX1
+                        #x_1[tempDet] = [meta['bboxes'][0][0][detX1][2]*numpy.array([1944,2592,1944,2592])]
+                        x_1[tempDet] = [bboxes[0][detX1][2]*numpy.array([1944,2592,1944,2592])]
+
                 df = pandas.DataFrame.from_dict(x_1)
                 tempMn = '%02d'%((int(dt.strftime('%M'))//5)*5)
                 mfn = os.path.join(
