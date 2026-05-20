@@ -40,12 +40,12 @@ def load_labels(path, encoding='utf-8'):
 class TFLiteModel:
     def __init__(self, model_fn, labels_fn=None, edge=False):
         # load model
-        if edge:
-            self.model = tflite.Interpreter(
-                  model_path=model_fn,
-                  experimental_delegates=[load_delegate(EDGETPU_SHARED_LIB, {})])
-        else:
-            self.model = tflite.Interpreter(model_path=model_fn)
+        #if edge:
+        #    self.model = tflite.Interpreter(
+        #          model_path=model_fn,
+        #          experimental_delegates=[load_delegate(EDGETPU_SHARED_LIB, {})])
+        #else:
+        self.model = tflite.Interpreter(model_path=model_fn)
         self.model.allocate_tensors()
 
         # load labels (if provided)
