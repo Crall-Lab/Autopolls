@@ -100,10 +100,10 @@ if os.path.isfile(customSetting):
     names = open('/etc/hostname','r')
     names1 = names.readlines()
     names.close()
-    if names1[-1].split('\n')[0] != settingsL['hostname']:
-        names = open('/etc/hostname','a')
-        names.write(settingsL['hostname']+'\n')
-        names.close() 
+    #if names1[-1].split('\n')[0] != settingsL['hostname']:
+    #    names = open('/etc/hostname','a')
+    #    names.write(settingsL['hostname']+'\n')
+    #    names.close() 
 
 class Grabber:
     def __init__(
@@ -457,7 +457,7 @@ class Grabber:
                 else:
                     x_1['still_filename'] = [meta['still_filename']]
                     x_1['detection'] = True
-                    
+
                     for detX1 in range(0,2):
                         tempDet = 'class_%s'%detX1
                         #x_1[tempDet] = [meta['bboxes'][0][0][detX1][0]]
