@@ -1,7 +1,7 @@
 import logging
 import threading
 import time
-
+import subprocess
 import cv2
 
 
@@ -38,13 +38,21 @@ class CVCaptureThread(threading.Thread):
     def _start_cap(self, properties=None):
         if hasattr(self, 'cap'):
             del self.cap
+
+        if properties is not None:
+            self.set_properties2(properties)
+
         self.cap = cv2.VideoCapture(self.url)
         #self.cap = cv2.VideoCapture(0)
         #logging.info("Cap started with backend: %s", self.cap.getBackendName())
 
         # TODO settings should be dynamic to allow focus adjustment
-        if properties is not None:
-            self.set_properties(properties)
+
+    
+    def set_properties2(self,properties):
+        ooo = subprocess.run(['v4l2-ctl','-d',str(self.url),
+                '--set-fmt-video=width=%s,height=%s,pixelformat=%s'%(properties['frame_width'],properties['frame_height'],'MJPG')])
+        logging.info("attempt set cam props via v4l2 unix %s" % (ooo))
 
     def set_properties(self, properties, retries=5):
         # reorder list of property names to have some elements first

@@ -3,12 +3,12 @@
 source $HOME/.bashrc
 source $HOME/.virtualenvs/autopolls/bin/activate
 
-cd $HOME/AP/Autopolls
+cd $HOME/Autopolls/pcam
 
 # exec here to use same PID to allow systemd watchdog
 #exec python3 -m pollinatorcam -l $1 -rdD
 # TODO flag for usb vs IP camera
-MODELSTATUS=`cat /home/pi/Desktop/configs | jq '.model_inference'`
+MODELSTATUS=`cat $HOME/Desktop/configs | jq '.model_inference'`
 
 if [ $MODELSTATUS == 0 ]
 then

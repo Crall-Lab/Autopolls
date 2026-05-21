@@ -33,12 +33,14 @@ import os
 
 import cv2
 import numpy
+import json
 
 from . import gstrecorder
 from . import cvrecorder
 
-hstname = open('/etc/hostname','r')
-hstname1 = hstname.readlines()[-1].split('\n')[0]
+hstname = open('%s/Desktop/configs'%os.getcwd().split('Autopolls')[0],'r')
+hstnam1 = json.load(hstname)
+hstname1 = hstnam1['hostname']
 hstname.close()
 
 mask_consts = {

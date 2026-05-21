@@ -17,9 +17,9 @@ import time
 
 import cv2
 import numpy
-import systemd.daemon
+import systemd #.daemon
 import pandas
-
+import pickle
 import tfliteserve
 
 from . import cvcapture
@@ -83,7 +83,8 @@ default_cfg = {
 data_dir = '/mnt/data/'
 
 # Loading in new config file settings
-customSetting = '/home/pi/Desktop/configs'
+#customSetting = '/home/pi/Desktop/configs'
+customSetting = os.path.join(os.path.expanduser('~'), 'Desktop', 'configs')
 if os.path.isfile(customSetting):
     in1 = open(customSetting,'r')
     settingsL = json.load(in1)
@@ -95,14 +96,23 @@ if os.path.isfile(customSetting):
     default_cfg['recording']['periodic_still'] = settingsL['periodic_still']
     default_cfg['detector']['threshold'] = settingsL['threshold']
 
-    # Change hostname to match config file
-    names = open('/etc/hostname','r')
-    names1 = names.readlines()
-    names.close()
-    if names1[-1].split('\n')[0] != settingsL['hostname']:
-        names = open('/etc/hostname','a')
-        names.write(settingsL['hostname']+'\n')
-        names.close() 
+    # Change settings to include hostname on first boot, then always read configs file
+    if os.path.isfile(os.path.expanduser('~')+'/.hostname') == False:
+        nnme = open('/etc/hostname','r')
+        name1 = nnme.readlines()[0].split('\n')[0]
+        nnme.close()
+        
+        names1 = settingsL['hostname']
+        if name1 != names1:
+            tname = names1+'-'+name1
+            dd = open(os.path.expanduser('~')+'/.hostname','wb')
+            pickle.dump(tname,dd)
+            dd.close()
+            settingsL['hostname'] = tname
+            
+            in1 = open(customSetting,'w')
+            json.dump(settingsL,in1)
+            in1.close()
 
 class Grabber:
     def __init__(
@@ -176,8 +186,8 @@ class Grabber:
 
         self.in_systemd = in_systemd
         if self.in_systemd:
-            #systemd.daemon.notify(systemd.daemon.Notification.READY)
-            systemd.daemon.notify('READY=1')
+            systemd.daemon.notify(systemd.daemon.Notification.READY)
+            #systemd.daemon.notify('READY=1')
             self.reset_watchdog()
         logging.info("Process in systemd? %s", self.in_systemd)
 
@@ -456,16 +466,18 @@ class Grabber:
                 else:
                     x_1['still_filename'] = [meta['still_filename']]
                     x_1['detection'] = True
-                for detX1 in range(0,3):
-                    tempDet = 'class_%s'%detX1
-                    #x_1[tempDet] = [meta['bboxes'][0][0][detX1][0]]
-                    x_1[tempDet] = [bboxes[0][detX1][0]]
-                    tempDet = 'detect_%s'%detX1
-                    #x_1[tempDet] = [meta['bboxes'][0][0][detX1][1]]
-                    x_1[tempDet] = [bboxes[0][detX1][1]]
-                    tempDet = 'bbox_%s'%detX1
-                    #x_1[tempDet] = [meta['bboxes'][0][0][detX1][2]*numpy.array([1944,2592,1944,2592])]
-                    x_1[tempDet] = [bboxes[0][detX1][2]*numpy.array([1944,2592,1944,2592])]
+
+                    for detX1 in range(0,2):
+                        tempDet = 'class_%s'%detX1
+                        #x_1[tempDet] = [meta['bboxes'][0][0][detX1][0]]
+                        x_1[tempDet] = [bboxes[0][detX1][0]]
+                        tempDet = 'detect_%s'%detX1
+                        #x_1[tempDet] = [meta['bboxes'][0][0][detX1][1]]
+                        x_1[tempDet] = [bboxes[0][detX1][1]]
+                        tempDet = 'bbox_%s'%detX1
+                        #x_1[tempDet] = [meta['bboxes'][0][0][detX1][2]*numpy.array([1944,2592,1944,2592])]
+                        x_1[tempDet] = [bboxes[0][detX1][2]*numpy.array([1944,2592,1944,2592])]
+
                 df = pandas.DataFrame.from_dict(x_1)
                 tempMn = '%02d'%((int(dt.strftime('%M'))//5)*5)
                 mfn = os.path.join(
@@ -479,8 +491,8 @@ class Grabber:
     def reset_watchdog(self):
         if not self.in_systemd:
             return
-        #systemd.daemon.notify(systemd.daemon.Notification.WATCHDOG)
-        systemd.daemon.notify('WATCHDOG=1')
+        systemd.daemon.notify(systemd.daemon.Notification.WATCHDOG)
+        #systemd.daemon.notify('WATCHDOG=1')
         logging.debug("Reset watchdog")
 
     def generate_thumbnail(self, im):

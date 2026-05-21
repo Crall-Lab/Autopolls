@@ -42,10 +42,10 @@ def find_device_info(locator):
     info = get_device_info()
     if '/dev/video' in locator:
         for i in info:
-            if locator in i['devices']:
+            if locator in i['devices'] and 'usb' in i['bus']:
                 return i
     else:  # assume a bus path/id
         for i in info:
-            if i['id'] == locator:
+            if i['id'] == locator and 'usb' in i['bus']:
                 return i
     raise Exception("Failed to find info for device[%s] in %s" % (locator, info))
