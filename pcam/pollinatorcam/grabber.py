@@ -19,7 +19,7 @@ import cv2
 import numpy
 import systemd #.daemon
 import pandas
-
+import pickle
 import tfliteserve
 
 from . import cvcapture
@@ -96,14 +96,23 @@ if os.path.isfile(customSetting):
     default_cfg['recording']['periodic_still'] = settingsL['periodic_still']
     default_cfg['detector']['threshold'] = settingsL['threshold']
 
-    # Change hostname to match config file
-    names = open('/etc/hostname','r')
-    names1 = names.readlines()
-    names.close()
-    #if names1[-1].split('\n')[0] != settingsL['hostname']:
-    #    names = open('/etc/hostname','a')
-    #    names.write(settingsL['hostname']+'\n')
-    #    names.close() 
+    # Change settings to include hostname on first boot, then always read configs file
+    if os.path.isfile(os.path.expanduser('~')+'/.hostname') == False:
+        nnme = open('/etc/hostname','r')
+        name1 = nnme.readlines()[0].split('\n')[0]
+        nnme.close()
+        
+        names1 = settingsL['hostname']
+        if name1 != names1:
+            tname = names1+'-'+name1
+            dd = open(os.path.expanduser('~')+'/.hostname','wb')
+            pickle.dump(tname,dd)
+            dd.close()
+            settingsL['hostname'] = tname
+            
+            in1 = open(customSetting,'w')
+            json.dump(settingsL,in1)
+            in1.close()
 
 class Grabber:
     def __init__(
