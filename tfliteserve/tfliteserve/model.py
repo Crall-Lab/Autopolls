@@ -141,7 +141,7 @@ class Detector(TFLiteModel):
         self.meta['type'] = 'detector'
         self.meta['n_boxes'] = self.n_boxes
     
-    def nms(bounding_boxes, confidence_score, threshold):
+    def nms(self,bounding_boxes, confidence_score, threshold):
         # If no bounding boxes, return empty list
         if len(bounding_boxes) == 0:
             return [], []
@@ -198,14 +198,20 @@ class Detector(TFLiteModel):
 
     def get_output(self):
         
-        bbxI = self.output_details[0][:4,:].T
-        cnfI = self.output_details[0][4:,:][0]
+        t = self.model.get_tensor(self.output_tensor_index)
+
+        bbxI = t[0][:4,:].T
+        cnfI = t[0][4:,:][0]
         #objs = detect.get_objects(interpreter, score_threshold=0.15, image_scale=scale)
-        bboxes, scores = nms(bbxI,cnfI,0.25)
+        bboxes, scores = self.nms(bbxI,cnfI,0.25)
 
         #scores, bboxes, _, classes = [numpy.squeeze(self.model.get_tensor(td['index'])) for td in self.output_details]
         # print(scores, bboxes, classes)
-        return numpy.hstack((0,scores[0],bboxes[0]))
+
+        # taking top-1 score for detection
+        rr = numpy.hstack((0,scores[0],bboxes[0]))
+
+        return rr
 
 
 class TFLiteServer(sharedmem.SharedMemoryServer):
