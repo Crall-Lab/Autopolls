@@ -11,11 +11,13 @@
 
 # Install OS
 
-Install the latest Pi OS using Raspberry Pi Imager. During setup, configure locale, timezone, keyboard, hostname, and SSH.
+**Welcome to the AutoPollS Github!** For more updates and detailed instructions check out the [AutoPollS](https://www.autopolls.ai) website.
+
+Install the latest Pi OS using Raspberry Pi Imager before proceeding. 
 
 # Environment variables
 
-Several environment variables are required to access the AutoPollS UI. Add the following lines to the **top** of your `~/.bashrc` (before the `if not running interactively` block):
+Several environment variables are required to access the AutoPollS UI. Add the following lines to the **top** of your `~/.bashrc` (before the `if not running interactively` block). Change the values to your choice of username and password:
 
 ```bash
 sudo nano ~/.bashrc
