@@ -73,10 +73,6 @@ cd ~/Autopolls/tfliteserve
 pip3 install setuptools
 
 # Install Edge TPU support
-echo "deb https://packages.cloud.google.com/apt coral-edgetpu-stable main" | sudo tee /etc/apt/sources.list.d/coral-edgetpu.list
-curl https://packages.cloud.google.com/apt/doc/apt-key.gpg | sudo apt-key add -
-sudo apt-get update
-sudo apt-get install libedgetpu1-std
 
 # Install the tfliteserve package
 pip3 install -e .
@@ -198,6 +194,16 @@ sudo systemctl restart nginx
 ```
 
 *Note: the overview service and timer are not needed for USB cameras and may be removed in a future update.*
+
+# Remove Admin Permissions for SystemD control off book
+As of May 2026, the Pi OS requires admin password for SystemD control of executables. To allow systemD control off boot
+these permissions must be disabled. To do this:
+1. Within the Pi GUI, click on the start menu (top left of screen)
+2. Select the "Preferences" tab
+3. Then select the 'Control Centre" tab
+4. Toggle "Admin Password" to "off" by clicking
+
+
 
 # Add script to fix and remount /dev/sda1 if corrupted
 
