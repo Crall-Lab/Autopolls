@@ -195,7 +195,7 @@ sudo systemctl restart nginx
 
 *Note: the overview service and timer are not needed for USB cameras and may be removed in a future update.*
 
-# Remove Admin Permissions for SystemD control off book
+# Remove Admin Permissions for SystemD control from boot
 As of May 2026, the Pi OS requires admin password for SystemD control of executables. To allow systemD control off boot
 these permissions must be disabled. To do this:
 1. Within the Pi GUI, click on the start menu (top left of screen)
