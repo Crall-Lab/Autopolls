@@ -1,5 +1,7 @@
 # Autopolls installation
 
+**Welcome to the AutoPollS Github!** For more updates and detailed instructions check out the [AutoPollS](https://www.autopolls.ai) website.
+
 ### Tested configuration (May 2026)
 
 * Raspberry Pi 4 Model B Rev 1.5 (2 GB)
@@ -10,8 +12,6 @@
 ---
 
 # Install OS
-
-**Welcome to the AutoPollS Github!** For more updates and detailed instructions check out the [AutoPollS](https://www.autopolls.ai) website.
 
 Install the latest Pi OS using Raspberry Pi Imager before proceeding. 
 
