@@ -224,8 +224,8 @@ cd ~
 #sudo apt-get install libraspberrypi-dev raspberrypi-kernel-headers
 git clone https://github.com/mccdaq/daqhats.git
 cd ~/daqhats
-~/.virtualenvs/autopolls/bin/pip install daqhats
-#sudo ./install.sh
+#~/.virtualenvs/autopolls/bin/pip install daqhats
+sudo ./install.sh
 ```
 
 If the libraries do not install automatically:
