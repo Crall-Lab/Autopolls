@@ -476,7 +476,13 @@ class Grabber:
                         x_1[tempDet] = [bboxes[0][detX1][1]]
                         tempDet = 'bbox_%s'%detX1
                         #x_1[tempDet] = [meta['bboxes'][0][0][detX1][2]*numpy.array([1944,2592,1944,2592])]
-                        x_1[tempDet] = [bboxes[0][detX1][2]*numpy.array([1944,2592,1944,2592])]
+                        #x_1[tempDet] = [bboxes[0][detX1][2]*numpy.array([1944,2592,1944,2592])]
+                        temp = bboxes[0][detX1][2]*numpy.array([1944,2592,1944,2592])
+                        x_1[tempDet+'_xmin'] = temp[1]
+                        x_1[tempDet+'_ymin']= temp[0]
+                        x_1[tempDet+'_xmax']= temp[3]
+                        x_1[tempDet+'_ymax']= temp[2]
+
 
                 df = pandas.DataFrame.from_dict(x_1)
                 tempMn = '%02d'%((int(dt.strftime('%M'))//5)*5)
