@@ -221,18 +221,18 @@ Attach the MCC134 thermocouple board to the Pi's 40-pin GPIO, then run:
 
 ```bash
 cd ~
-sudo apt-get install libraspberrypi-dev raspberrypi-kernel-headers
+#sudo apt-get install libraspberrypi-dev raspberrypi-kernel-headers
 git clone https://github.com/mccdaq/daqhats.git
 cd ~/daqhats
-sudo ./install.sh
+~/.virtualenvs/autopolls/bin/pip install daqhats
+#sudo ./install.sh
 ```
 
 If the libraries do not install automatically:
 
 ```bash
-~/.virtualenvs/autopolls/bin/pip install daqhats
-deactivate
-sudo pip install daqhats --break-system-packages
+#deactivate
+#sudo pip install daqhats --break-system-packages
 ```
 
 Move the temperature sensor script into the daqhats example directory:
