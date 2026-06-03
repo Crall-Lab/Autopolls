@@ -209,11 +209,11 @@ these permissions must be disabled. To do this:
 
 NTFS corruption can occur after extended use. The following cron job monitors and repairs the mount automatically.
 
-Open crontab (`crontab -e`) and add this line:
+#Open crontab (`crontab -e`) and add this line:
 
-```
-* * * * * sudo python3 ~/Autopolls/utils/mountFix.py
-```
+#```
+#* * * * * sudo python3 ~/Autopolls/utils/mountFix.py
+#```
 
 # Install MCC134 libraries and script (optional)
 
