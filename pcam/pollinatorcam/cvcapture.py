@@ -3,7 +3,7 @@ import threading
 import time
 import subprocess
 import cv2
-
+import os
 
 class CVCaptureThread(threading.Thread):
     def __init__(self, *args, **kwargs):
@@ -50,9 +50,36 @@ class CVCaptureThread(threading.Thread):
 
     
     def set_properties2(self,properties):
-        ooo = subprocess.run(['v4l2-ctl','-d',str(self.url),
-                '--set-fmt-video=width=%s,height=%s,pixelformat=%s'%(properties['frame_width'],properties['frame_height'],'MJPG')])
-        logging.info("attempt set cam props via v4l2 unix %s" % (ooo))
+        #ooo = subprocess.Popen(['v4l2-ctl','-d',str(self.url),
+        #        '--set-fmt-video=width=%s,height=%s,pixelformat=%s'%(properties['frame_width'],properties['frame_height'],'MJPG')])
+        #logging.info("attempt set cam props via v4l2 unix %s" % (ooo))
+        #ooo = str(['v4l2-ctl','-d',str(self.url),'--set-fmt-video=width=%s,height=%s,pixelformat=%s'%(properties['frame_width'],properties['frame_height'],'MJPG')])
+        
+        # Below is a temporary (but functional) fix to issues with opencv.set() not functioning in python
+        # Create v4l2 command to execute in bash
+        ooo = 'v4l2-ctl '+'-d '+str(self.url)+' --set-fmt-video=width=%s,height=%s,pixelformat=%s \n'%(properties['frame_width'],properties['frame_height'],'MJPG')
+
+        # write command to shared file for serial execution to prevent Pi crashing
+        if os.path.isfile('/home/v4l2_list.txt') == False:
+            in1 = open('/home/v4l2_list.txt','w')
+        else:
+            in1 = open('/home/v4l2_list.txt','a')
+        in1.write(ooo)
+        in1.close()
+
+        # Wait until the command is cleared from the file before proceeding
+        tb = False
+        while tb == False:
+            txb = False
+            time.sleep(1)
+            in1 = open('/home/v4l2_list.txt','r')
+            oo = in1.readlines()
+            for ee in oo:
+                if ee == ooo:
+                    txb = True
+                print(ee)
+            if not txb:
+                tb = True
 
     def set_properties(self, properties, retries=5):
         # reorder list of property names to have some elements first

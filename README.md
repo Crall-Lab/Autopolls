@@ -217,6 +217,7 @@ NTFS corruption can occur after extended use. The following cron job monitors an
 
 # Install MCC134 libraries and script (optional)
 
+
 Attach the MCC134 thermocouple board to the Pi's 40-pin GPIO, then run:
 
 ```bash
