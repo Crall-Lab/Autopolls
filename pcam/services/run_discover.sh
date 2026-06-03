@@ -17,3 +17,4 @@ if [ ! -d "/dev/shm/pcam" ]; then
 fi
 #python3 -m pollinatorcam discover -v -i $MY_IP/24
 python3 -m pollinatorcam discover -u
+python3 -m pollinatorcam v4l2_mount

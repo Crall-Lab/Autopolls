@@ -1,6 +1,6 @@
 {
 	"hostname": "autopollsUnitBee",
-	"model_inference": 1,
+	"model_inference": 0,
 	"classes": "single",
 	"coral": 0,
 	"threshold": 0.0,

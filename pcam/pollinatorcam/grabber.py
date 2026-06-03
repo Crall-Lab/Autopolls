@@ -467,7 +467,7 @@ class Grabber:
                     x_1['still_filename'] = [meta['still_filename']]
                     x_1['detection'] = True
 
-                    for detX1 in range(0,2):
+                    for detX1 in range(0,1):
                         tempDet = 'class_%s'%detX1
                         #x_1[tempDet] = [meta['bboxes'][0][0][detX1][0]]
                         x_1[tempDet] = [bboxes[0][detX1][0]]
