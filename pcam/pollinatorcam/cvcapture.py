@@ -55,15 +55,17 @@ class CVCaptureThread(threading.Thread):
         #logging.info("attempt set cam props via v4l2 unix %s" % (ooo))
         #ooo = str(['v4l2-ctl','-d',str(self.url),'--set-fmt-video=width=%s,height=%s,pixelformat=%s'%(properties['frame_width'],properties['frame_height'],'MJPG')])
         
+        s_path = os.path.join(os.path.expanduser('~'), 'Autopolls', 'pcam','v4l2_list.txt')
+        
         # Below is a temporary (but functional) fix to issues with opencv.set() not functioning in python
         # Create v4l2 command to execute in bash
         ooo = 'v4l2-ctl '+'-d '+str(self.url)+' --set-fmt-video=width=%s,height=%s,pixelformat=%s \n'%(properties['frame_width'],properties['frame_height'],'MJPG')
 
         # write command to shared file for serial execution to prevent Pi crashing
-        if os.path.isfile('/home/v4l2_list.txt') == False:
-            in1 = open('/home/v4l2_list.txt','w')
+        if os.path.isfile(s_path) == False:
+            in1 = open(s_path,'w')
         else:
-            in1 = open('/home/v4l2_list.txt','a')
+            in1 = open(s_path,'a')
         in1.write(ooo)
         in1.close()
 
@@ -72,7 +74,7 @@ class CVCaptureThread(threading.Thread):
         while tb == False:
             txb = False
             time.sleep(1)
-            in1 = open('/home/v4l2_list.txt','r')
+            in1 = open(s_path,'r')
             oo = in1.readlines()
             for ee in oo:
                 if ee == ooo:

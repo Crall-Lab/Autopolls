@@ -9,11 +9,13 @@ import os
 import time
 
 def run():
+    s_path = os.path.join(os.path.expanduser('~'), 'Autopolls', 'pcam','v4l2_list.txt')
+    
     # pause to let pcam-discover ID USB cameras and write commands to v4l2
     time.sleep(8)
 
     # read command list
-    in1 = open('/home/v4l2_list.txt','r')
+    in1 = open(s_path,'r')
     dd = in1.readlines()
     in1.close()
 
@@ -26,7 +28,7 @@ def run():
         ooo = subprocess.Popen(ee.split(' '))
 
     # read in commands again in case of modification while script is running
-    in1 = open('/home/v4l2_list.txt','r')
+    in1 = open(s_path,'r')
     dde = in1.readlines()
     in1.close()
 
@@ -43,7 +45,7 @@ def run():
             o.append(e)
 
     # write any new commands to the list or empty the file
-    in1 = open('/home/v4l2_list.txt','w')
+    in1 = open(s_path,'w')
     for ee in o:
         in1.write(ee)
     in1.close()
