@@ -320,7 +320,7 @@ class Grabber:
                 coords, slices, detector = roi
                 yield (
                     coords,
-                    cv2.resize(image[slices], (th, tw), interpolation=cv2.INTER_AREA),
+                    cv2.resize(image[slices], (th, tw), interpolation=cv2.INTER_AREA)/255,
                     detector)
         
         return cf
